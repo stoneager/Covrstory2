@@ -62,9 +62,10 @@ const LoginPage = () => {
       });
 
       if (response.data.token) {
-        // Remove localStorage set here
-        // localStorage.setItem('token', response.data.token);
-        // localStorage.setItem('userRole', response.data.user.role);
+        // Store token and user info in localStorage
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('userRole', response.data.user.role);
+        localStorage.setItem('userInfo', JSON.stringify(response.data.user));
         redirectUser(response.data.user.role, response.data.token);
       }
     } catch (error) {
@@ -135,9 +136,10 @@ const LoginPage = () => {
       });
 
       if (response.data.token) {
-        // Remove localStorage set here
-        // localStorage.setItem('token', response.data.token);
-        // localStorage.setItem('userRole', response.data.user.role);
+        // Store token and user info in localStorage
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('userRole', response.data.user.role);
+        localStorage.setItem('userInfo', JSON.stringify(response.data.user));
         redirectUser(response.data.user.role, response.data.token);
       }
     } catch (error) {
