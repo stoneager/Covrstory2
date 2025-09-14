@@ -9,6 +9,7 @@ import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import PaymentPage from './pages/PaymentPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import OrdersPage from './pages/OrdersPage';
 
 function App() {
   useEffect(() => {
@@ -65,6 +66,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <PaymentPage />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/orders" 
+                  element={
+                    <ProtectedRoute>
+                      <OrdersPage />
                     </ProtectedRoute>
                   } 
                 />

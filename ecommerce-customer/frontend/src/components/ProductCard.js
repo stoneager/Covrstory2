@@ -4,44 +4,13 @@ import { faShoppingCart, faPlus, faMinus } from '@fortawesome/free-solid-svg-ico
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 
-const ProductCard = ({ product, showAddToCart = false }) => {
+const ProductCard = ({ product }) => {
   const [selectedVariant, setSelectedVariant] = useState(0);
   const [selectedSize, setSelectedSize] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
-  const { addToCart } = useCart();
+  const { cartItems, addToCart, updateCartItem, removeFromCart } = useCart();
   const { user } = useAuth();
-
-  const handleAddToCart = async () => {
-    if (!user) {
-      window.location.href = 'http://localhost:3002';
-      return;
-    }
-
-    const variant = product.variants[selectedVariant];
-    const size = variant.sizes[selectedSize];
-    
-    if (!size.productQuantityId) {
-      alert('Product variant not available');
-      return;
-    }
-
-    setLoading(true);
-    const result = await addToCart(size.productQuantityId, quantity);
-    
-    if (result.success) {
-      alert('Product added to cart!');
-    } else {
-      alert(result.error);
-    }
-    setLoading(false);
-  };
-
-  const handleProductClick = () => {
-    if (!user && !showAddToCart) {
-      window.location.href = 'http://localhost:3002';
-    }
-  };
 
   if (!product.variants || product.variants.length === 0) {
     return null;
@@ -49,8 +18,36 @@ const ProductCard = ({ product, showAddToCart = false }) => {
 
   const currentVariant = product.variants[selectedVariant];
   const currentSize = currentVariant.sizes[selectedSize];
-  const discountedPrice = currentVariant.discountedPrice || currentVariant.price;
-  const hasDiscount = discountedPrice < currentVariant.price;
+
+  // Find cart item for current size
+  const cartItem = cartItems && Array.isArray(cartItems)
+    ? cartItems.find(ci => ci.productQuantity._id === currentSize.productQuantityId)
+    : undefined;
+  const cartQty = cartItem ? cartItem.qty : 0;
+
+  const handleAddToCart = async () => {
+    if (!user) {
+      window.location.href = 'http://localhost:3002';
+      return;
+    }
+    setLoading(true);
+    await addToCart(currentSize.productQuantityId, quantity);
+    setLoading(false);
+  };
+
+  const handleUpdateQty = async (newQty) => {
+    if (newQty <= 0) {
+      await removeFromCart(currentSize.productQuantityId);
+    } else {
+      await updateCartItem(currentSize.productQuantityId, newQty);
+    }
+  };
+
+  const handleProductClick = () => {
+    if (!user) {
+      window.location.href = 'http://localhost:3002';
+    }
+  };
 
   return (
     <div 
@@ -89,7 +86,7 @@ const ProductCard = ({ product, showAddToCart = false }) => {
               {product.variants.map((variant, index) => (
                 <button
                   key={index}
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
                     setSelectedVariant(index);
                     setSelectedSize(0);
@@ -108,14 +105,14 @@ const ProductCard = ({ product, showAddToCart = false }) => {
         )}
 
         {/* Size Selection */}
-        {showAddToCart && currentVariant.sizes.length > 1 && (
+        {currentVariant.sizes.length > 1 && (
           <div className="mb-3">
             <label className="block text-sm font-medium text-gray-700 mb-1">Size</label>
             <div className="flex space-x-2">
               {currentVariant.sizes.map((size, index) => (
                 <button
                   key={index}
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
                     setSelectedSize(index);
                   }}
@@ -139,17 +136,17 @@ const ProductCard = ({ product, showAddToCart = false }) => {
         <div className="mb-3">
           <div className="flex items-center space-x-2">
             <span className="text-lg font-bold text-gray-900">
-              ₹{discountedPrice.toLocaleString()}
+              ₹{currentVariant.discountedPrice.toLocaleString()}
             </span>
-            {hasDiscount && (
+            {currentVariant.hasDiscount && (
               <span className="text-sm text-gray-500 line-through">
-                ₹{currentVariant.price.toLocaleString()}
+                ₹{currentVariant.originalPrice.toLocaleString()}
               </span>
             )}
           </div>
-          {hasDiscount && (
+          {currentVariant.hasDiscount && (
             <span className="text-sm text-green-600 font-medium">
-              {Math.round(((currentVariant.price - discountedPrice) / currentVariant.price) * 100)}% off
+              {Math.round(((currentVariant.originalPrice - currentVariant.discountedPrice) / currentVariant.originalPrice) * 100)}% off
             </span>
           )}
         </div>
@@ -163,49 +160,49 @@ const ProductCard = ({ product, showAddToCart = false }) => {
           )}
         </div>
 
-        {/* Add to Cart Section */}
-        {showAddToCart && user && (
+        {/* Add to Cart & Quantity Controls */}
+        {user && (
           <div className="space-y-3">
-            {/* Quantity Selector */}
-            <div className="flex items-center space-x-3">
-              <span className="text-sm font-medium text-gray-700">Quantity:</span>
-              <div className="flex items-center space-x-2">
+            {cartQty > 0 ? (
+              <div className="flex items-center space-x-3 mt-2">
+                <span className="text-sm font-medium text-gray-700">Quantity:</span>
                 <button
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
-                    setQuantity(Math.max(1, quantity - 1));
+                    handleUpdateQty(cartQty - 1);
                   }}
-                  className="p-1 border border-gray-300 rounded hover:bg-gray-50"
+                  className="p-2 border border-gray-300 rounded hover:bg-gray-50"
+                  disabled={loading || cartQty <= 1}
                 >
-                  <FontAwesomeIcon icon={faMinus} className="text-xs" />
+                  <FontAwesomeIcon icon={faMinus} />
                 </button>
                 <span className="px-3 py-1 border border-gray-300 rounded text-center min-w-[3rem]">
-                  {quantity}
+                  {cartQty}
                 </span>
                 <button
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
-                    setQuantity(Math.min(currentSize.qty, quantity + 1));
+                    handleUpdateQty(cartQty + 1);
                   }}
-                  className="p-1 border border-gray-300 rounded hover:bg-gray-50"
+                  className="p-2 border border-gray-300 rounded hover:bg-gray-50"
+                  disabled={loading || currentSize.qty <= cartQty}
                 >
-                  <FontAwesomeIcon icon={faPlus} className="text-xs" />
+                  <FontAwesomeIcon icon={faPlus} />
                 </button>
               </div>
-            </div>
-
-            {/* Add to Cart Button */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleAddToCart();
-              }}
-              disabled={currentSize.qty === 0 || loading}
-              className="w-full btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <FontAwesomeIcon icon={faShoppingCart} className="mr-2" />
-              {loading ? 'Adding...' : 'Add to Cart'}
-            </button>
+            ) : (
+              <button
+                onClick={e => {
+                  e.stopPropagation();
+                  handleAddToCart();
+                }}
+                disabled={currentSize.qty === 0 || loading}
+                className="w-full btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <FontAwesomeIcon icon={faShoppingCart} className="mr-2" />
+                {loading ? 'Adding...' : 'Add to Cart'}
+              </button>
+            )}
           </div>
         )}
       </div>

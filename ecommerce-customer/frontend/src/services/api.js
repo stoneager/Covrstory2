@@ -74,4 +74,9 @@ export const paymentAPI = {
   verifyPayment: (paymentData) => api.post('/payment/verify', paymentData),
 };
 
+// Orders API
+export const ordersAPI = {
+  getMyOrders: () => api.get('/orders/my'),
+};
+
 export default api;

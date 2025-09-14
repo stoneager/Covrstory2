@@ -5,11 +5,11 @@ const Discount = require('../models/Discount');
 
 const router = express.Router();
 
-// Get all products with discounts applied
+// Get all products with productQuantities and discounts applied
 router.get('/', async (req, res) => {
   try {
     const { search, collection, type, gender, minPrice, maxPrice } = req.query;
-    
+
     // Build product filter
     let productFilter = {};
     if (search) {
@@ -32,8 +32,8 @@ router.get('/', async (req, res) => {
     // Get active discounts
     const discounts = await Discount.find({ isActive: true });
 
-    // For each product, fetch its quantities and apply discounts
-    const productsWithVariants = await Promise.all(products.map(async (product) => {
+    // For each product, fetch its productQuantities and apply discounts
+    const productsWithQuantities = await Promise.all(products.map(async (product) => {
       let quantities = await ProductQuantity.find({ product: product._id });
 
       // Apply price filters
@@ -46,23 +46,16 @@ router.get('/', async (req, res) => {
         });
       }
 
-      if (quantities.length === 0) return null;
-
       // Apply discounts
       quantities = quantities.map(qty => {
         let discountedPrice = qty.price;
-        
-        // Find applicable discount
         const applicableDiscount = discounts.find(discount => {
-          // If discount applies to all products or specific products
-          return discount.products.length === 0 || 
+          return discount.products.length === 0 ||
                  discount.products.some(p => p.toString() === product._id.toString());
         });
-
         if (applicableDiscount) {
           discountedPrice = qty.price * (1 - applicableDiscount.discount_percent / 100);
         }
-
         return {
           ...qty.toObject(),
           discountedPrice: Math.round(discountedPrice),
@@ -71,35 +64,14 @@ router.get('/', async (req, res) => {
         };
       });
 
-      // Group by color
-      const variantsMap = {};
-      quantities.forEach(qty => {
-        if (!variantsMap[qty.colour]) {
-          variantsMap[qty.colour] = {
-            colour: qty.colour,
-            price: qty.originalPrice,
-            discountedPrice: qty.discountedPrice,
-            images: qty.images || [],
-            sizes: []
-          };
-        }
-        variantsMap[qty.colour].sizes.push({
-          size: qty.size,
-          qty: qty.qty,
-          productQuantityId: qty._id
-        });
-      });
-
-      const variants = Object.values(variantsMap);
-      
       return {
         ...product.toObject(),
-        variants
+        productQuantities: quantities
       };
     }));
 
-    // Filter out products with no variants (due to price filtering)
-    const filteredProducts = productsWithVariants.filter(product => product !== null);
+    // Filter out products with no productQuantities (due to price filtering)
+    const filteredProducts = productsWithQuantities.filter(product => product.productQuantities.length > 0);
 
     res.json(filteredProducts);
   } catch (error) {

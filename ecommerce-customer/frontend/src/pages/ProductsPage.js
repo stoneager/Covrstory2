@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { productsAPI, collectionsAPI } from '../services/api';
 import ProductCard from '../components/ProductCard';
+import { useCart } from '../contexts/CartContext';
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -13,6 +14,7 @@ const ProductsPage = () => {
   const [selectedType, setSelectedType] = useState('');
   const [selectedGender, setSelectedGender] = useState('');
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+  const { cartItems, addToCart, updateCartItem, removeFromCart } = useCart();
 
   useEffect(() => {
     fetchProducts();
@@ -40,6 +42,7 @@ const ProductsPage = () => {
       };
       
       const response = await productsAPI.getAll(params);
+      console.log('Products : ', response.data);
       setProducts(response.data);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -47,6 +50,11 @@ const ProductsPage = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // Log products whenever they change
+    console.log('Fetched products:', products);
+  }, [products]);
 
   const fetchCollections = async () => {
     try {
@@ -63,6 +71,12 @@ const ProductsPage = () => {
     setSelectedType('');
     setSelectedGender('');
     setPriceRange({ min: '', max: '' });
+  };
+
+  // Helper to get cart item for a productQuantity._id
+  const getCartItem = (productQuantityId) => {
+    if (!Array.isArray(cartItems)) return undefined;
+    return cartItems.find(ci => ci.productQuantity._id === productQuantityId);
   };
 
   return (
@@ -176,13 +190,41 @@ const ProductsPage = () => {
         </div>
       ) : products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map(product => (
-            <ProductCard 
-              key={product._id} 
-              product={product} 
-              showAddToCart={true}
-            />
-          ))}
+          {products.map(product => {
+            // Transform productQuantities to variants format for ProductCard
+            const variantsMap = {};
+            (product.productQuantities || []).forEach(qty => {
+              if (!variantsMap[qty.colour]) {
+                variantsMap[qty.colour] = {
+                  colour: qty.colour,
+                  price: qty.discountedPrice ?? qty.price,
+                  discountedPrice: qty.discountedPrice ?? qty.price,
+                  originalPrice: qty.originalPrice ?? qty.price,
+                  hasDiscount: qty.hasDiscount ?? false,
+                  images: qty.images || [],
+                  sizes: []
+                };
+              }
+              variantsMap[qty.colour].sizes.push({
+                size: qty.size,
+                qty: qty.qty,
+                productQuantityId: qty._id
+              });
+            });
+            const variants = Object.values(variantsMap);
+
+            // Compose the product object for ProductCard
+            const productForCard = {
+              ...product,
+              variants
+            };
+
+            return (
+              <div key={product._id}>
+                <ProductCard product={productForCard} />
+              </div>
+            );
+          })}
         </div>
       ) : (
         <div className="text-center py-12">
