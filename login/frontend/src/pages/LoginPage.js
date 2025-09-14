@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPhone } from '@fortawesome/free-solid-svg-icons';
+import { faPhone, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithPopup, GoogleAuthProvider, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
@@ -21,7 +21,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 const LoginPage = () => {
-  const [authMethod, setAuthMethod] = useState('google'); // 'google' or 'phone'
+  const [authMethod, setAuthMethod] = useState('google');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otp, setOtp] = useState('');
   const [verificationId, setVerificationId] = useState('');
@@ -29,20 +29,18 @@ const LoginPage = () => {
   const [otpSent, setOtpSent] = useState(false);
 
   useEffect(() => {
-    // Check if user is already logged in
     const token = localStorage.getItem('token');
     if (token) {
-      // Redirect based on role stored in localStorage
       const userRole = localStorage.getItem('userRole');
-      redirectUser(userRole);
+      redirectUser(userRole, token);
     }
   }, []);
 
   const redirectUser = (role, token) => {
     if (role === 'owner') {
-      window.location.href = `http://localhost:3000?token=${token}&role=${role}`; // Owner app
+      window.location.href = `http://localhost:3001?token=${token}&role=${role}`;
     } else {
-      window.location.href = `http://localhost:3001?token=${token}&role=${role}`; // Customer app
+      window.location.href = `http://localhost:3000?token=${token}&role=${role}`;
     }
   };
 
@@ -53,7 +51,6 @@ const LoginPage = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Send user data to backend
       const response = await authAPI.login({
         email: user.email,
         name: user.displayName,
@@ -62,7 +59,6 @@ const LoginPage = () => {
       });
 
       if (response.data.token) {
-        // Store token and user info in localStorage
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('userRole', response.data.user.role);
         localStorage.setItem('userInfo', JSON.stringify(response.data.user));
@@ -80,9 +76,7 @@ const LoginPage = () => {
     if (!window.recaptchaVerifier) {
       window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
         size: 'invisible',
-        callback: () => {
-          // reCAPTCHA solved
-        }
+        callback: () => {}
       });
     }
   };
@@ -127,7 +121,6 @@ const LoginPage = () => {
       const result = await auth.signInWithCredential(credential);
       const user = result.user;
 
-      // Send user data to backend
       const response = await authAPI.login({
         email: user.email || `${user.phoneNumber}@phone.auth`,
         name: user.displayName || `User ${user.phoneNumber}`,
@@ -136,7 +129,6 @@ const LoginPage = () => {
       });
 
       if (response.data.token) {
-        // Store token and user info in localStorage
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('userRole', response.data.user.role);
         localStorage.setItem('userInfo', JSON.stringify(response.data.user));
@@ -151,18 +143,19 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
+        {/* Header */}
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-white mb-2">
-            Welcome to {process.env.REACT_APP_COMPANY_NAME || 'E-Store'}
-          </h2>
-          <p className="text-blue-100">Sign in to continue</p>
+          <h1 className="text-4xl font-bold text-black mb-2 tracking-tight">
+            {process.env.REACT_APP_COMPANY_NAME || 'STORE'}
+          </h1>
+          <p className="text-gray-600 text-lg">Sign in to continue</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-xl p-8">
+        <div className="bg-gray-50 p-8 space-y-8">
           {/* Auth Method Selection */}
-          <div className="flex space-x-4 mb-6">
+          <div className="grid grid-cols-2 gap-4">
             <button
               onClick={() => {
                 setAuthMethod('google');
@@ -170,10 +163,10 @@ const LoginPage = () => {
                 setOtp('');
                 setPhoneNumber('');
               }}
-              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
+              className={`py-3 px-4 font-medium transition-all duration-200 ${
                 authMethod === 'google'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-black text-white'
+                  : 'bg-white text-black border border-gray-300 hover:border-black'
               }`}
             >
               <FontAwesomeIcon icon={faGoogle} className="mr-2" />
@@ -186,10 +179,10 @@ const LoginPage = () => {
                 setOtp('');
                 setPhoneNumber('');
               }}
-              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
+              className={`py-3 px-4 font-medium transition-all duration-200 ${
                 authMethod === 'phone'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-black text-white'
+                  : 'bg-white text-black border border-gray-300 hover:border-black'
               }`}
             >
               <FontAwesomeIcon icon={faPhone} className="mr-2" />
@@ -203,11 +196,18 @@ const LoginPage = () => {
               <button
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                className="w-full btn btn-google text-lg py-3"
+                className="w-full bg-white text-black border border-gray-300 py-4 px-6 font-medium hover:border-black transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <FontAwesomeIcon icon={faGoogle} className="mr-3 text-red-500" />
+                {loading ? (
+                  <FontAwesomeIcon icon={faSpinner} className="mr-3 animate-spin" />
+                ) : (
+                  <FontAwesomeIcon icon={faGoogle} className="mr-3 text-red-500" />
+                )}
                 {loading ? 'Signing in...' : 'Continue with Google'}
               </button>
+              <p className="text-xs text-gray-600 text-center">
+                Sign in with your Google account to access your personalized shopping experience
+              </p>
             </div>
           )}
 
@@ -217,59 +217,65 @@ const LoginPage = () => {
               {!otpSent ? (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-black mb-2">
                       Phone Number
                     </label>
                     <input
                       type="tel"
-                      placeholder="Enter your phone number"
+                      placeholder="Enter 10-digit mobile number"
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
-                      className="input"
+                      className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-colors duration-200"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Enter 10-digit mobile number (without +91)
+                    <p className="text-xs text-gray-600 mt-1">
+                      We'll send you a verification code
                     </p>
                   </div>
                   <button
                     onClick={handleSendOTP}
                     disabled={loading || !phoneNumber}
-                    className="w-full btn btn-primary text-lg py-3"
+                    className="w-full bg-black text-white py-4 px-6 font-medium hover:bg-gray-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading ? 'Sending OTP...' : 'Send OTP'}
+                    {loading ? (
+                      <FontAwesomeIcon icon={faSpinner} className="mr-2 animate-spin" />
+                    ) : null}
+                    {loading ? 'Sending OTP...' : 'Send Verification Code'}
                   </button>
                 </>
               ) : (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Enter OTP
+                    <label className="block text-sm font-medium text-black mb-2">
+                      Verification Code
                     </label>
                     <input
                       type="text"
-                      placeholder="Enter 6-digit OTP"
+                      placeholder="Enter 6-digit code"
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
                       maxLength="6"
-                      className="input"
+                      className="w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-colors duration-200 text-center text-lg tracking-widest"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
-                      OTP sent to {phoneNumber}
+                    <p className="text-xs text-gray-600 mt-1">
+                      Code sent to {phoneNumber}
                     </p>
                   </div>
                   <button
                     onClick={handleVerifyOTP}
                     disabled={loading || !otp}
-                    className="w-full btn btn-primary text-lg py-3"
+                    className="w-full bg-black text-white py-4 px-6 font-medium hover:bg-gray-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading ? 'Verifying...' : 'Verify OTP'}
+                    {loading ? (
+                      <FontAwesomeIcon icon={faSpinner} className="mr-2 animate-spin" />
+                    ) : null}
+                    {loading ? 'Verifying...' : 'Verify Code'}
                   </button>
                   <button
                     onClick={() => {
                       setOtpSent(false);
                       setOtp('');
                     }}
-                    className="w-full text-blue-600 hover:text-blue-800 font-medium"
+                    className="w-full text-black hover:text-gray-600 font-medium py-2 transition-colors duration-200"
                   >
                     Change Phone Number
                   </button>
@@ -280,8 +286,10 @@ const LoginPage = () => {
 
           <div id="recaptcha-container"></div>
 
-          <div className="mt-6 text-center text-sm text-gray-600">
+          {/* Footer */}
+          <div className="text-center text-xs text-gray-600 space-y-2">
             <p>By signing in, you agree to our Terms of Service and Privacy Policy</p>
+            <p>Secure authentication powered by Firebase</p>
           </div>
         </div>
       </div>

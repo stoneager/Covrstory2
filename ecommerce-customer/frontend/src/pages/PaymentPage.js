@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCreditCard, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faCreditCard, faLock, faArrowLeft, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { paymentAPI } from '../services/api';
 import { useCart } from '../contexts/CartContext';
 
@@ -30,7 +30,9 @@ const PaymentPage = () => {
     document.body.appendChild(script);
 
     return () => {
-      document.body.removeChild(script);
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
     };
   }, [checkoutData, navigate]);
 
@@ -86,7 +88,7 @@ const PaymentPage = () => {
           contact: checkoutData.user?.mobile || ''
         },
         theme: {
-          color: '#3B82F6'
+          color: '#000000'
         },
         modal: {
           ondismiss: function() {
@@ -107,96 +109,145 @@ const PaymentPage = () => {
 
   if (!checkoutData || !orderSummary) {
     return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Invalid Payment Session</h2>
-          <p className="text-gray-600 mb-8">Please start from your cart to proceed with payment.</p>
-          <button
-            onClick={() => navigate('/cart')}
-            className="btn btn-primary"
-          >
-            Go to Cart
-          </button>
+      <div className="min-h-screen bg-white">
+        <div className="container-custom py-16">
+          <div className="max-w-md mx-auto text-center">
+            <h2 className="heading-md text-black mb-4">Invalid Payment Session</h2>
+            <p className="text-body mb-8">Please start from your cart to proceed with payment.</p>
+            <button
+              onClick={() => navigate('/cart')}
+              className="btn btn-primary"
+            >
+              Go to Cart
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Payment</h1>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Payment Method */}
-        <div>
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Payment Method</h2>
-            
-            <div className="border border-blue-200 rounded-lg p-4 bg-blue-50">
-              <div className="flex items-center space-x-3">
-                <FontAwesomeIcon icon={faCreditCard} className="text-blue-600 text-xl" />
-                <div>
-                  <h3 className="font-medium text-gray-900">Razorpay Secure Payment</h3>
-                  <p className="text-sm text-gray-600">
-                    Pay securely using Credit Card, Debit Card, Net Banking, UPI, or Wallet
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 flex items-center space-x-2 text-sm text-gray-600">
-              <FontAwesomeIcon icon={faLock} className="text-green-600" />
-              <span>Your payment information is secure and encrypted</span>
-            </div>
+    <div className="min-h-screen bg-white">
+      <div className="container-custom py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="heading-lg text-black mb-2">Complete Payment</h1>
+            <p className="text-body">Secure payment powered by Razorpay</p>
           </div>
+          <button
+            onClick={() => navigate('/checkout')}
+            className="btn btn-outline"
+          >
+            <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
+            Back to Checkout
+          </button>
         </div>
-
-        {/* Order Summary */}
-        <div>
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Summary</h2>
-            
-            <div className="space-y-3 mb-6">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Subtotal</span>
-                <span className="font-medium">₹{orderSummary.subtotal.toLocaleString()}</span>
-              </div>
-              
-              {orderSummary.coupon && (
-                <div className="flex justify-between text-green-600">
-                  <span>Coupon Discount ({orderSummary.coupon.code})</span>
-                  <span>-₹{orderSummary.discount.toLocaleString()}</span>
+        
+        <div className="max-w-2xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Payment Method */}
+            <div className="space-y-6">
+              <div>
+                <h2 className="font-semibold text-black text-xl mb-4">Payment Method</h2>
+                
+                <div className="bg-gray-50 border-2 border-black p-6">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center">
+                      <FontAwesomeIcon icon={faCreditCard} className="text-white text-xl" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-black">Razorpay Secure Payment</h3>
+                      <p className="text-sm text-gray-600">
+                        Multiple payment options available
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="bg-white border border-gray-200 px-2 py-1 rounded text-center">
+                      Credit Card
+                    </div>
+                    <div className="bg-white border border-gray-200 px-2 py-1 rounded text-center">
+                      Debit Card
+                    </div>
+                    <div className="bg-white border border-gray-200 px-2 py-1 rounded text-center">
+                      Net Banking
+                    </div>
+                    <div className="bg-white border border-gray-200 px-2 py-1 rounded text-center">
+                      UPI
+                    </div>
+                  </div>
                 </div>
-              )}
-              
-              <div className="flex justify-between">
-                <span className="text-gray-600">Shipping</span>
-                <span className="font-medium">Free</span>
               </div>
-              
-              <div className="border-t pt-3">
-                <div className="flex justify-between">
-                  <span className="text-lg font-semibold">Total</span>
-                  <span className="text-lg font-semibold">₹{orderSummary.total.toLocaleString()}</span>
+
+              {/* Security Features */}
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3 text-sm text-gray-600">
+                  <FontAwesomeIcon icon={faLock} className="text-green-600" />
+                  <span>256-bit SSL encryption</span>
+                </div>
+                <div className="flex items-center space-x-3 text-sm text-gray-600">
+                  <FontAwesomeIcon icon={faCheckCircle} className="text-blue-600" />
+                  <span>PCI DSS compliant</span>
+                </div>
+                <div className="flex items-center space-x-3 text-sm text-gray-600">
+                  <FontAwesomeIcon icon={faCheckCircle} className="text-purple-600" />
+                  <span>Trusted by millions</span>
                 </div>
               </div>
             </div>
 
-            <button
-              onClick={handlePayment}
-              disabled={loading || !razorpayLoaded}
-              className="w-full btn btn-primary text-lg py-3 mb-4"
-            >
-              {loading ? 'Processing...' : !razorpayLoaded ? 'Loading Payment Gateway...' : `Pay ₹${orderSummary.total.toLocaleString()}`}
-            </button>
+            {/* Order Summary */}
+            <div>
+              <div className="bg-gray-50 p-6">
+                <h2 className="font-semibold text-black text-xl mb-6">Order Summary</h2>
+                
+                <div className="space-y-4 mb-6">
+                  <div className="flex justify-between text-gray-600">
+                    <span>Subtotal</span>
+                    <span>₹{orderSummary.subtotal.toLocaleString()}</span>
+                  </div>
+                  
+                  {orderSummary.coupon && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Discount ({orderSummary.coupon.code})</span>
+                      <span>-₹{orderSummary.discount.toLocaleString()}</span>
+                    </div>
+                  )}
+                  
+                  <div className="flex justify-between text-gray-600">
+                    <span>Shipping</span>
+                    <span className="text-green-600 font-medium">Free</span>
+                  </div>
+                  
+                  <div className="border-t pt-4">
+                    <div className="flex justify-between text-2xl font-bold text-black">
+                      <span>Total</span>
+                      <span>₹{orderSummary.total.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
 
-            <div className="text-center">
-              <button
-                onClick={() => navigate('/checkout')}
-                className="text-blue-600 hover:text-blue-800 font-medium"
-              >
-                Back to Checkout
-              </button>
+                <button
+                  onClick={handlePayment}
+                  disabled={loading || !razorpayLoaded}
+                  className="w-full btn btn-primary btn-lg mb-4"
+                >
+                  <FontAwesomeIcon icon={faLock} className="mr-2" />
+                  {loading 
+                    ? 'Processing...' 
+                    : !razorpayLoaded 
+                    ? 'Loading Payment Gateway...' 
+                    : `Pay ₹${orderSummary.total.toLocaleString()}`
+                  }
+                </button>
+
+                <p className="text-xs text-gray-600 text-center">
+                  By clicking "Pay", you agree to our Terms of Service and Privacy Policy.
+                  Your payment information is secure and encrypted.
+                </p>
+              </div>
             </div>
           </div>
         </div>
