@@ -63,6 +63,13 @@ export const usersAPI = {
 	getAll: () => api.get('/users'),
 };
 
+export const authAPI = {
+  login: (credentials) => api.post('/auth/login', credentials),
+  verifyToken: (token) => api.get('/auth/verify', {
+	headers: { Authorization: `Bearer ${token}` }
+  }),
+};
+
 // Upload API
 export const uploadAPI = {
 	productImages: (formData) => api.post('/upload/product', formData, {

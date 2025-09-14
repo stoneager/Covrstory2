@@ -38,9 +38,9 @@ const LoginPage = () => {
 
   const redirectUser = (role, token) => {
     if (role === 'owner') {
-      window.location.href = `http://localhost:3001?token=${token}&role=${role}`;
-    } else {
       window.location.href = `http://localhost:3000?token=${token}&role=${role}`;
+    } else {
+      window.location.href = `http://localhost:3001?token=${token}&role=${role}`;
     }
   };
 
