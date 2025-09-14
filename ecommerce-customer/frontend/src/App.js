@@ -10,8 +10,12 @@ import CheckoutPage from './pages/CheckoutPage';
 import PaymentPage from './pages/PaymentPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import OrdersPage from './pages/OrdersPage';
+import ProductDetailsPage from './pages/ProductDetailsPage';
+import { productsAPI } from './services/api';
 
 function App() {
+  const [products, setProducts] = React.useState([]);
+
   useEffect(() => {
     // Read token and role from URL
     const params = new URLSearchParams(window.location.search);
@@ -26,6 +30,13 @@ function App() {
       const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
       window.history.replaceState({}, '', newUrl);
     }
+
+    // Fetch products for details page
+    const fetchProducts = async () => {
+      const response = await productsAPI.getAll({});
+      setProducts(response.data);
+    };
+    fetchProducts();
   }, []);
 
   return (
@@ -74,6 +85,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <OrdersPage />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/product/:id" 
+                  element={
+                    <ProtectedRoute>
+                      <ProductDetailsPage products={products} />
                     </ProtectedRoute>
                   } 
                 />

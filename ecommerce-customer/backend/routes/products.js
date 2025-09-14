@@ -79,4 +79,45 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Get single product by ID with productQuantities and discounts
+router.get('/:id', async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id).populate('collection');
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Get active discounts
+    const discounts = await Discount.find({ isActive: true });
+
+    // Fetch productQuantities for this product
+    let quantities = await ProductQuantity.find({ product: product._id });
+
+    // Apply discounts
+    quantities = quantities.map(qty => {
+      let discountedPrice = qty.price;
+      const applicableDiscount = discounts.find(discount => {
+        return discount.products.length === 0 ||
+               discount.products.some(p => p.toString() === product._id.toString());
+      });
+      if (applicableDiscount) {
+        discountedPrice = qty.price * (1 - applicableDiscount.discount_percent / 100);
+      }
+      return {
+        ...qty.toObject(),
+        discountedPrice: Math.round(discountedPrice),
+        originalPrice: qty.price,
+        hasDiscount: discountedPrice < qty.price
+      };
+    });
+
+    res.json({
+      ...product.toObject(),
+      productQuantities: quantities
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;

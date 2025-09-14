@@ -4,6 +4,7 @@ import { faSearch, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { productsAPI, collectionsAPI } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { useCart } from '../contexts/CartContext';
+import { Link } from 'react-router-dom';
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -220,9 +221,9 @@ const ProductsPage = () => {
             };
 
             return (
-              <div key={product._id}>
+              <Link key={product._id} to={`/product/${product._id}`}>
                 <ProductCard product={productForCard} />
-              </div>
+              </Link>
             );
           })}
         </div>

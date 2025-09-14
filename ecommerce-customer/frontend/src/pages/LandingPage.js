@@ -72,13 +72,42 @@ const LandingPage = () => {
 
           {products.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {products.slice(0, 8).map(product => (
-                <ProductCard 
-                  key={product._id} 
-                  product={product} 
-                  showAddToCart={false}
-                />
-              ))}
+              {products.slice(0, 8).map(product => {
+                // Transform productQuantities to variants format for ProductCard
+                const variantsMap = {};
+                (product.productQuantities || []).forEach(qty => {
+                  if (!variantsMap[qty.colour]) {
+                    variantsMap[qty.colour] = {
+                      colour: qty.colour,
+                      price: qty.discountedPrice ?? qty.price,
+                      discountedPrice: qty.discountedPrice ?? qty.price,
+                      originalPrice: qty.originalPrice ?? qty.price,
+                      hasDiscount: qty.hasDiscount ?? false,
+                      images: qty.images || [],
+                      sizes: []
+                    };
+                  }
+                  variantsMap[qty.colour].sizes.push({
+                    size: qty.size,
+                    qty: qty.qty,
+                    productQuantityId: qty._id
+                  });
+                });
+                const variants = Object.values(variantsMap);
+
+                const productForCard = {
+                  ...product,
+                  variants
+                };
+
+                return (
+                  <ProductCard 
+                    key={product._id} 
+                    product={productForCard} 
+                    showAddToCart={false}
+                  />
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-12">

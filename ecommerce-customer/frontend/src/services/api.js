@@ -46,6 +46,7 @@ export const productsAPI = {
     ).toString();
     return api.get(`/products${queryString ? `?${queryString}` : ''}`);
   },
+  getById: (id) => api.get(`/products/${id}`),
 };
 
 // Collections API
