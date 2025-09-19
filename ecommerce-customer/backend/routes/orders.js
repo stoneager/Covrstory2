@@ -1,20 +1,24 @@
 const express = require('express');
 const router = express.Router();
-const authMiddleware = require('../middleware/authMiddleware');
 const Order = require('../models/Order');
+const { auth, customerOnly } = require('../middleware/auth');
 
-// @route   GET api/orders/my
-// @desc    Get all orders for the logged-in customer except pending ones
-// @access  Private
-router.get('/my', authMiddleware, async (req, res) => {
+router.get('/my', auth, customerOnly, async (req, res) => {
   try {
-    const orders = await Order.find({
-      user: req.user._id,
-      stages: { $ne: 'pending' }
-    }).sort({ createdAt: -1 });
+    const orders = await Order.find({ user: req.user._id })
+      .populate({
+        path: 'items.productQuantity',
+        populate: {
+          path: 'product',
+          select: 'name type gender activity collection'
+        }
+      })
+      .sort({ createdAt: -1 });
+
     res.json({ orders });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch orders' });
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
