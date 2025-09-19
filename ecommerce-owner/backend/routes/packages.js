@@ -31,7 +31,12 @@ router.post('/', async (req, res) => {
 router.put('/:id/status', async (req, res) => {
   try {
     const { status } = req.body;
+    // Update package status
     const pkg = await Package.findByIdAndUpdate(req.params.id, { stages: status }, { new: true });
+    if (pkg && pkg.orders && pkg.orders.length > 0) {
+      // Update all orders in the package
+      await Order.updateMany({ _id: { $in: pkg.orders } }, { stages: status });
+    }
     res.json(pkg);
   } catch (error) {
     res.status(500).json({ message: error.message });
