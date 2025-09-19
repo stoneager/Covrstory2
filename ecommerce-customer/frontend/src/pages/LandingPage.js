@@ -48,16 +48,26 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gray-50 overflow-hidden">
+      <section className="relative overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img
+            src="https://images.pexels.com/photos/416978/pexels-photo-416978.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop"
+            alt="Athletic wear model"
+            className="w-full h-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+        </div>
+        
         <div className="container-custom">
-          <div className="relative z-10 py-24 md:py-32 lg:py-40">
+          <div className="relative z-10 py-32 md:py-40 lg:py-48">
             <div className="max-w-4xl">
-              <h1 className="heading-xl text-black mb-6 fade-in">
+              <h1 className="heading-xl text-white mb-6 fade-in">
                 Discover Your
                 <br />
                 <span className="italic">Perfect Style</span>
               </h1>
-              <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-2xl leading-relaxed fade-in">
+              <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-2xl leading-relaxed fade-in">
                 Premium quality clothing designed for the modern lifestyle. 
                 Crafted with attention to detail and built to last.
               </p>
@@ -65,32 +75,27 @@ const LandingPage = () => {
                 {!user ? (
                   <button
                     onClick={() => window.location.href = 'http://localhost:3002'}
-                    className="btn btn-primary btn-lg"
+                    className="bg-white text-black px-8 py-4 text-lg font-semibold hover:bg-gray-100 transition-colors duration-300"
                   >
                     Shop Now
                   </button>
                 ) : (
                   <Link
                     to="/products"
-                    className="btn btn-primary btn-lg"
+                    className="bg-white text-black px-8 py-4 text-lg font-semibold hover:bg-gray-100 transition-colors duration-300 inline-flex items-center justify-center"
                   >
                     Shop Now
                   </Link>
                 )}
                 <Link
                   to="/products"
-                  className="btn btn-outline btn-lg"
+                  className="border-2 border-white text-white px-8 py-4 text-lg font-semibold hover:bg-white hover:text-black transition-colors duration-300 inline-flex items-center justify-center"
                 >
                   Explore Collection
                 </Link>
               </div>
             </div>
           </div>
-        </div>
-        
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0 bg-gradient-to-br from-black via-transparent to-transparent"></div>
         </div>
       </section>
 

@@ -80,4 +80,10 @@ export const ordersAPI = {
   getMyOrders: () => api.get('/orders/my'),
 };
 
+// Returns API
+export const returnsAPI = {
+  create: (data) => api.post('/returns', data),
+  getMyReturns: () => api.get('/returns/me'),
+};
+
 export default api;

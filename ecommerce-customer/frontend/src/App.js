@@ -12,6 +12,7 @@ import PaymentPage from './pages/PaymentPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import OrdersPage from './pages/OrdersPage';
 import ProductDetailsPage from './pages/ProductDetailsPage';
+import ReturnsPage from './pages/ReturnsPage';
 import { productsAPI } from './services/api';
 
 function App() {
@@ -86,6 +87,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <OrdersPage />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/returns" 
+                  element={
+                    <ProtectedRoute>
+                      <ReturnsPage />
                     </ProtectedRoute>
                   } 
                 />

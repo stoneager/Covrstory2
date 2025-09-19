@@ -36,7 +36,8 @@ const Header = () => {
     { to: '/', label: 'Home' },
     ...(user ? [
       { to: '/products', label: 'Shop' },
-      { to: '/orders', label: 'Orders' }
+      { to: '/orders', label: 'Orders' },
+      { to: '/returns', label: 'Returns' }
     ] : [])
   ];
 

@@ -26,6 +26,7 @@ app.use('/api/coupons', require('./routes/coupons'));
 app.use('/api/discounts', require('./routes/discounts'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/packages', require('./routes/packages'));
+app.use('/api/returns', require('./routes/returns'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

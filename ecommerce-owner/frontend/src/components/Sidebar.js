@@ -7,6 +7,7 @@ import {
   faLayerGroup, 
   faPercent, 
   faTicketAlt,
+  faUndo,
   faSignOutAlt
 } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../contexts/AuthContext';
@@ -22,7 +23,8 @@ const Sidebar = () => {
     { path: '/collections', label: 'Collections', icon: faLayerGroup },
     { path: '/discounts', label: 'Discounts', icon: faPercent },
     { path: '/coupons', label: 'Coupons', icon: faTicketAlt },
-    { path: '/order-tracking', label: 'Order Tracking', icon: faBoxes }
+    { path: '/order-tracking', label: 'Order Tracking', icon: faBoxes },
+    { path: '/returns', label: 'Returns Management', icon: faUndo }
   ];
 
   const handleLogout = () => {
