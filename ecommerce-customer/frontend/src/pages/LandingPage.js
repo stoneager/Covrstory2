@@ -1,17 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { productsAPI } from '../services/api';
+import { productsAPI, collectionsAPI } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { useAuth } from '../contexts/AuthContext';
 
 const LandingPage = () => {
   const [products, setProducts] = useState([]);
+  const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const carouselRef = useRef(null);
   const { user } = useAuth();
 
   useEffect(() => {
     fetchProducts();
+    fetchCollections();
   }, []);
+
+  const fetchCollections = async () => {
+    try {
+      const response = await collectionsAPI.getAll();
+      setCollections(response.data);
+    } catch (error) {
+      console.error('Error fetching collections:', error);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -81,7 +94,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Categories Section */}
+      {/* Categories Section - Carousel */}
       <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="text-center mb-16">
@@ -90,35 +103,75 @@ const LandingPage = () => {
               Discover our carefully curated collections designed for every occasion
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Link 
-              to="/products?gender=m" 
-              className="group relative overflow-hidden bg-gray-100 aspect-[4/3] hover-lift"
+          <div className="relative w-full max-w-4xl mx-auto">
+            <div
+              ref={carouselRef}
+              className="overflow-hidden rounded-xl shadow-lg"
+              style={{ height: '400px', position: 'relative' }}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10"></div>
-              <div className="absolute bottom-8 left-8 z-20">
-                <h3 className="text-3xl font-bold text-white mb-2">Men's Collection</h3>
-                <p className="text-white/90 text-lg">Discover masculine essentials</p>
+              <div
+                className="flex transition-transform duration-500"
+                style={{ transform: `translateX(-${activeIndex * (100 / collections.length)}%)`, width: `${collections.length * 100}%`, height: '400px' }}
+              >
+                {collections.map((collection, idx) => (
+                  <div key={collection._id} style={{width: `${100 / collections.length}%`, height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                    <Link
+                      to={`/products?collection=${collection._id}`}
+                      className="relative block w-full h-full"
+                    >
+                      <div className="flex flex-col items-center justify-center w-full h-full" style={{ height: '400px' }}>
+                        {collection.image ? (
+                          <div className="flex items-center justify-center w-full h-80 bg-white rounded-t-lg shadow overflow-hidden">
+                            <img
+                              src={collection.image}
+                              alt={collection.name}
+                              className="object-contain mx-auto block"
+                              style={{ maxHeight: '90%', maxWidth: '90%' }}
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-full h-80 bg-gray-200 flex items-center justify-center rounded-t-lg shadow">
+                            <span className="text-gray-400 text-lg">No Image</span>
+                          </div>
+                        )}
+                        <div className="w-full bg-white rounded-b-lg shadow px-6 py-4 flex items-center justify-center border-t border-gray-100" style={{ minHeight: '60px' }}>
+                          <h3 className="text-2xl font-bold text-black text-center m-0">{collection.name}</h3>
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+                ))}
               </div>
-              <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
-                <span className="text-gray-400 text-lg">Men's Collection</span>
+              {/* Left Arrow */}
+              <button
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow z-30"
+                onClick={() => setActiveIndex((prev) => Math.max(prev - 1, 0))}
+                disabled={activeIndex === 0}
+                style={{ outline: 'none' }}
+              >
+                <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+              </button>
+              {/* Right Arrow */}
+              <button
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow z-30"
+                onClick={() => setActiveIndex((prev) => Math.min(prev + 1, collections.length - 1))}
+                disabled={activeIndex === collections.length - 1}
+                style={{ outline: 'none' }}
+              >
+                <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6" /></svg>
+              </button>
+              {/* Navigation Dots */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-30">
+                {collections.map((_, idx) => (
+                  <button
+                    key={idx}
+                    className={`w-3 h-3 rounded-full ${activeIndex === idx ? 'bg-black' : 'bg-gray-300'} border border-white`}
+                    onClick={() => setActiveIndex(idx)}
+                    style={{ outline: 'none' }}
+                  />
+                ))}
               </div>
-            </Link>
-            
-            <Link 
-              to="/products?gender=f" 
-              className="group relative overflow-hidden bg-gray-100 aspect-[4/3] hover-lift"
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10"></div>
-              <div className="absolute bottom-8 left-8 z-20">
-                <h3 className="text-3xl font-bold text-white mb-2">Women's Collection</h3>
-                <p className="text-white/90 text-lg">Elegant and contemporary</p>
-              </div>
-              <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
-                <span className="text-gray-400 text-lg">Women's Collection</span>
-              </div>
-            </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -267,6 +320,6 @@ const LandingPage = () => {
       </section>
     </div>
   );
-};
+}
 
 export default LandingPage;
