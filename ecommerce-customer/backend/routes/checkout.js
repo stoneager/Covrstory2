@@ -99,19 +99,36 @@ router.post('/create-order', auth, customerOnly, async (req, res) => {
       colour: item.productQuantity.colour
     }));
 
-    // Create order
-    const order = new Order({
+    // Check for existing pending order for this user and cart
+    const existingOrder = await Order.findOne({
       user: req.user._id,
-      items: orderItems,
-      total_mrp: subtotal,
-      coupon_code: couponCode || null,
-      discount_amount: discount || 0,
-      final_amount: total,
       stages: 'pending',
-      payment_status: 'pending'
+      payment_status: 'pending',
+      total_mrp: subtotal,
+      final_amount: total,
+      coupon_code: couponCode || null,
+      discount_amount: discount || 0
     });
 
-    await order.save();
+    let order;
+    if (existingOrder) {
+      // Optionally update items if cart changed
+      existingOrder.items = orderItems;
+      await existingOrder.save();
+      order = existingOrder;
+    } else {
+      order = new Order({
+        user: req.user._id,
+        items: orderItems,
+        total_mrp: subtotal,
+        coupon_code: couponCode || null,
+        discount_amount: discount || 0,
+        final_amount: total,
+        stages: 'pending',
+        payment_status: 'pending'
+      });
+      await order.save();
+    }
 
     // If coupon was used, mark it as used
     if (couponCode) {

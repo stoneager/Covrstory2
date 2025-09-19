@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { ordersAPI } from '../services/api';
+import OrderSummaryModal from '../components/OrderSummaryModal';
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -21,6 +24,16 @@ const OrdersPage = () => {
     };
     fetchOrders();
   }, []);
+
+  const handleViewOrder = (order) => {
+    setSelectedOrder(order);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedOrder(null);
+  };
 
   if (loading) return <div>Loading...</div>;
 
@@ -45,6 +58,7 @@ const OrdersPage = () => {
               <th className="px-4 py-2">Total</th>
               <th className="px-4 py-2">Status</th>
               <th className="px-4 py-2">Date</th>
+              <th className="px-4 py-2">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -54,10 +68,27 @@ const OrdersPage = () => {
                 <td className="border px-4 py-2">₹{order.total_mrp.toLocaleString()}</td>
                 <td className="border px-4 py-2">{order.stages}</td>
                 <td className="border px-4 py-2">{new Date(order.createdAt).toLocaleDateString()}</td>
+                <td className="border px-4 py-2">
+                  <button
+                    className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition"
+                    onClick={() => handleViewOrder(order)}
+                  >
+                    View
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+      )}
+      {/* Order Summary Modal */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black bg-opacity-40 z-40" onClick={closeModal}></div>
+          <div className="z-50">
+            <OrderSummaryModal order={selectedOrder} onClose={closeModal} />
+          </div>
+        </div>
       )}
     </div>
   );
