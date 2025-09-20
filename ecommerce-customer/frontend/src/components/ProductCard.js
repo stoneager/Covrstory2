@@ -55,64 +55,73 @@ const ProductCard = ({ product }) => {
 
   return (
     <div 
-      className="group cursor-pointer"
+      className="product-card-enhanced cursor-pointer"
       onClick={handleProductClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Product Image */}
-      <div className="relative aspect-[3/4] mb-4 overflow-hidden bg-gray-100">
+      <div className="product-image-container">
         {currentVariant.images && currentVariant.images.length > 0 ? (
           <img
             src={currentVariant.images[0]}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-400 text-sm">No Image</span>
+          <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+            <span className="text-gray-400 text-sm font-medium">No Image</span>
           </div>
         )}
         
         {/* Discount Badge */}
         {currentVariant.hasDiscount && (
-          <div className="absolute top-4 left-4 bg-red-600 text-white px-2 py-1 text-xs font-semibold">
+          <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 text-xs font-bold rounded-full">
             {Math.round(((currentVariant.originalPrice - currentVariant.discountedPrice) / currentVariant.originalPrice) * 100)}% OFF
           </div>
         )}
 
-        {/* Quick Actions */}
+        {/* Product Overlay with Quick Actions */}
+        <div className="product-overlay">
+          <div className="product-quick-actions">
+            <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-50 transition-all duration-200 hover:scale-110">
+              <FontAwesomeIcon icon={faHeart} className="text-gray-600 text-sm" />
+            </button>
+          </div>
+        </div>
+
+        {/* Wishlist Button */}
         <div className={`absolute top-4 right-4 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-          <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors duration-200">
+          <button className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-all duration-200 hover:scale-110">
             <FontAwesomeIcon icon={faHeart} className="text-gray-600 text-sm" />
           </button>
         </div>
 
         {/* Stock Status */}
         {currentSize.qty === 0 && (
-          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <span className="text-white font-semibold">Out of Stock</span>
+          <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center rounded-t-2xl">
+            <span className="text-white font-bold text-lg">Out of Stock</span>
           </div>
         )}
       </div>
       
       {/* Product Info */}
-      <div className="space-y-3">
+      <div className="product-info-enhanced">
         {/* Category */}
-        <div className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+        <div className="product-category">
           {product.collection?.name} • {product.type} • {product.gender === 'm' ? 'Men' : 'Women'}
         </div>
 
         {/* Product Name */}
-        <h3 className="font-semibold text-black text-lg leading-tight group-hover:text-gray-700 transition-colors duration-200">
+        <h3 className="product-title">
           {product.name}
         </h3>
 
         {/* Color Selection */}
         {product.variants.length > 1 && (
-          <div className="flex items-center space-x-2">
-            <span className="text-xs text-gray-600 font-medium">Color:</span>
-            <div className="flex space-x-1">
+          <div className="flex items-center space-x-3">
+            <span className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Color:</span>
+            <div className="flex space-x-2">
               {product.variants.map((variant, index) => (
                 <button
                   key={index}
@@ -121,10 +130,10 @@ const ProductCard = ({ product }) => {
                     setSelectedVariant(index);
                     setSelectedSize(0);
                   }}
-                  className={`w-6 h-6 rounded-full border-2 transition-all duration-200 ${
+                  className={`w-7 h-7 rounded-full border-2 transition-all duration-200 shadow-sm ${
                     selectedVariant === index
-                      ? 'border-black scale-110'
-                      : 'border-gray-300 hover:border-gray-400'
+                      ? 'border-gray-900 scale-110 shadow-md'
+                      : 'border-gray-200 hover:border-gray-400 hover:scale-105'
                   }`}
                   style={{ backgroundColor: variant.colour.toLowerCase() }}
                   title={variant.colour}
@@ -136,9 +145,9 @@ const ProductCard = ({ product }) => {
 
         {/* Size Selection */}
         {currentVariant.sizes.length > 1 && (
-          <div className="flex items-center space-x-2">
-            <span className="text-xs text-gray-600 font-medium">Size:</span>
-            <div className="flex space-x-1">
+          <div className="flex items-center space-x-3">
+            <span className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Size:</span>
+            <div className="flex space-x-2">
               {currentVariant.sizes.map((size, index) => (
                 <button
                   key={index}
@@ -147,12 +156,12 @@ const ProductCard = ({ product }) => {
                     setSelectedSize(index);
                   }}
                   disabled={size.qty === 0}
-                  className={`px-2 py-1 text-xs font-medium border transition-all duration-200 ${
+                  className={`px-3 py-1.5 text-xs font-semibold border transition-all duration-200 rounded-lg ${
                     selectedSize === index
-                      ? 'border-black bg-black text-white'
+                      ? 'border-gray-900 bg-gray-900 text-white shadow-md'
                       : size.qty === 0
-                      ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'border-gray-300 text-gray-700 hover:border-black'
+                      ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+                      : 'border-gray-200 text-gray-700 hover:border-gray-900 hover:bg-gray-50'
                   }`}
                 >
                   {size.size.toUpperCase()}
@@ -163,12 +172,12 @@ const ProductCard = ({ product }) => {
         )}
 
         {/* Price */}
-        <div className="flex items-center space-x-2">
-          <span className="text-lg font-bold text-black">
+        <div className="product-price-container">
+          <span className="product-price-current">
             ₹{currentVariant.discountedPrice.toLocaleString()}
           </span>
           {currentVariant.hasDiscount && (
-            <span className="price-original">
+            <span className="product-price-original">
               ₹{currentVariant.originalPrice.toLocaleString()}
             </span>
           )}
@@ -176,13 +185,13 @@ const ProductCard = ({ product }) => {
 
         {/* Add to Cart / Quantity Controls */}
         {user && (
-          <div className="pt-2">
+          <div className="pt-4">
             {cartQty > 0 ? (
-              <div className="quantity-selector">
+              <div className="quantity-selector shadow-sm">
                 <button
                   onClick={(e) => handleUpdateQty(e, cartQty - 1)}
                   disabled={loading}
-                  className="hover:bg-gray-100"
+                  className="hover:bg-gray-50"
                 >
                   <FontAwesomeIcon icon={faMinus} className="text-xs" />
                 </button>
@@ -195,7 +204,7 @@ const ProductCard = ({ product }) => {
                 <button
                   onClick={(e) => handleUpdateQty(e, cartQty + 1)}
                   disabled={loading || currentSize.qty <= cartQty}
-                  className="hover:bg-gray-100"
+                  className="hover:bg-gray-50"
                 >
                   <FontAwesomeIcon icon={faPlus} className="text-xs" />
                 </button>
@@ -204,7 +213,7 @@ const ProductCard = ({ product }) => {
               <button
                 onClick={handleAddToCart}
                 disabled={currentSize.qty === 0 || loading}
-                className="w-full btn btn-primary btn-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-gray-900 text-white py-3 px-4 rounded-lg font-semibold hover:bg-gray-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
               >
                 <FontAwesomeIcon icon={faShoppingBag} className="mr-2" />
                 {loading ? 'Adding...' : 'Add to Cart'}
