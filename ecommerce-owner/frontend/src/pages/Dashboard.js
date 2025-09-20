@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import OrderDetailsModal from '../components/OrderDetailsModal';
 import { 
 	Chart as ChartJS, 
 	CategoryScale, 
@@ -18,6 +19,7 @@ const Dashboard = () => {
 	const [orders, setOrders] = useState([]);
 	const [filter, setFilter] = useState('day');
 	const [loading, setLoading] = useState(true);
+	const [selectedOrder, setSelectedOrder] = useState(null);
 
 	useEffect(() => {
 		fetchData();
@@ -202,15 +204,18 @@ const Dashboard = () => {
 									</td>
 									<td className="text-gray-600">{new Date(order.createdAt).toLocaleDateString()}</td>
 									<td>
-										<button className="btn btn-secondary btn-sm">
-											View Details
-										</button>
+														<button className="btn btn-secondary btn-sm" onClick={() => setSelectedOrder(order)}>
+															View Details
+														</button>
 									</td>
 								</tr>
 							))}
 						</tbody>
 					</table>
-				</div>
+						</div>
+						{selectedOrder && (
+							<OrderDetailsModal order={selectedOrder} onClose={() => setSelectedOrder(null)} />
+						)}
 				
 				{orders.length === 0 && (
 					<div className="text-center py-12">

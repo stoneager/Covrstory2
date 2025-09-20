@@ -13,6 +13,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import OrdersPage from './pages/OrdersPage';
 import ProductDetailsPage from './pages/ProductDetailsPage';
 import ReturnsPage from './pages/ReturnsPage';
+import ProfilePage from './pages/ProfilePage';
 import { productsAPI } from './services/api';
 
 function App() {
@@ -103,6 +104,26 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <ProductDetailsPage products={products} />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/profile" 
+                  element={
+                    <ProtectedRoute>
+                      <ProfilePage onUpdate={async (form) => {
+                        try {
+                          await import('./services/api').then(api => api.checkoutAPI.updateUserInfo({
+                            name: form.name,
+                            mobile: form.mobile,
+                            address: form.address
+                          }));
+                          alert('Profile updated successfully!');
+                          window.location.reload();
+                        } catch (err) {
+                          alert('Error updating profile');
+                        }
+                      }} />
                     </ProtectedRoute>
                   } 
                 />

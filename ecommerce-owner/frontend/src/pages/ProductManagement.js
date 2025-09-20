@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faEdit, faTrash, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faEdit, faTrash, faSearch , faBoxes} from '@fortawesome/free-solid-svg-icons';
 import { productsAPI, collectionsAPI } from '../services/api';
 import ProductModal from '../components/ProductModal';
 

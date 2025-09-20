@@ -125,7 +125,9 @@ router.post('/create-order', auth, customerOnly, async (req, res) => {
         discount_amount: discount || 0,
         final_amount: total,
         stages: 'pending',
-        payment_status: 'pending'
+        payment_status: 'pending',
+        mobile: req.user.mobile,
+        address: req.user.address
       });
       await order.save();
     }
@@ -143,7 +145,12 @@ router.post('/create-order', auth, customerOnly, async (req, res) => {
       user: {
         name: req.user.name,
         email: req.user.email,
-        mobile: req.user.mobile
+        mobile: req.user.mobile,
+        address: req.user.address
+      },
+      order: {
+        mobile: order.mobile,
+        address: order.address
       }
     });
   } catch (error) {

@@ -264,7 +264,7 @@ body {
 
 /* Enhanced Product Card Styles */
 .product-card-enhanced {
-  @apply bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-gray-100;
+  @apply bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100;
 }
 
 .product-card-enhanced:hover {

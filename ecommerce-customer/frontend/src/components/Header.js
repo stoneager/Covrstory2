@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { checkoutAPI } from '../services/api';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -18,6 +19,7 @@ const Header = () => {
   const { getCartItemsCount } = useCart();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  // Remove modal state
 
   const handleLogout = () => {
     logout();
@@ -95,12 +97,12 @@ const Header = () => {
                   </Link>
                   
                   {/* User Profile */}
-                  <div className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                  <button type="button" onClick={() => navigate('/profile')} className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">
                     <div className="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center">
                       <FontAwesomeIcon icon={faUser} className="text-white text-sm" />
                     </div>
                     <span className="text-sm font-medium text-gray-700 hidden lg:block">{user.name}</span>
-                  </div>
+                  </button>
                   
                   {/* Logout */}
                   <button

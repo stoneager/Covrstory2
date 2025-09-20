@@ -1,17 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTag, faLock, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { useCart } from '../contexts/CartContext';
 import { checkoutAPI } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const CheckoutPage = () => {
   const { cart, getCartTotal } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponLoading, setCouponLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [mobile, setMobile] = useState('');
+  const [address, setAddress] = useState({ line1: '', area: '', city: '', pincode: '' });
+
+  // Autofill mobile and address from user.js
+  useEffect(() => {
+    if (user) {
+      setMobile(user.mobile || '');
+      setAddress({
+        line1: user.address?.line1 || '',
+        area: user.address?.area || '',
+        city: user.address?.city || '',
+        pincode: user.address?.pincode || ''
+      });
+    }
+  }, [user]);
 
   const subtotal = getCartTotal();
   const discount = appliedCoupon ? appliedCoupon.discount : 0;
@@ -45,8 +62,14 @@ const CheckoutPage = () => {
   };
 
   const handleProceedToPayment = async () => {
+    // Validate mobile and address
+    if (!mobile.trim() || !address.line1.trim() || !address.area.trim() || !address.city.trim() || !address.pincode.trim()) {
+      alert('Please fill in all required fields for mobile and address.');
+      return;
+    }
     setLoading(true);
     try {
+      // Only update order.js, not user.js
       const checkoutPayload = {
         items: cart.items.map(item => ({
           productQuantity: item.productQuantity._id,
@@ -56,11 +79,11 @@ const CheckoutPage = () => {
         subtotal,
         couponCode: appliedCoupon?.code || null,
         discount,
-        total
+        total,
+        mobile,
+        address
       };
-
       const response = await checkoutAPI.createOrder(checkoutPayload);
-      
       // Navigate to payment page with checkout data
       navigate('/payment', { 
         state: { 
@@ -239,6 +262,60 @@ const CheckoutPage = () => {
                 </div>
               </div>
 
+              {/* User Info Middleware */}
+              <div className="mb-6 p-4 bg-white border rounded">
+                <h3 className="font-semibold text-lg mb-4">Contact & Address</h3>
+                <div className="mb-3">
+                  <label className="block text-sm font-medium mb-1">Mobile Number</label>
+                  <input
+                    type="text"
+                    className="input w-full"
+                    value={mobile}
+                    onChange={e => setMobile(e.target.value)}
+                    placeholder="Enter mobile number"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="block text-sm font-medium mb-1">Address Line 1</label>
+                  <input
+                    type="text"
+                    className="input w-full"
+                    value={address.line1}
+                    onChange={e => setAddress({ ...address, line1: e.target.value })}
+                    placeholder="Flat/House/Building"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="block text-sm font-medium mb-1">Area</label>
+                  <input
+                    type="text"
+                    className="input w-full"
+                    value={address.area}
+                    onChange={e => setAddress({ ...address, area: e.target.value })}
+                    placeholder="Area/Locality"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="block text-sm font-medium mb-1">City</label>
+                  <input
+                    type="text"
+                    className="input w-full"
+                    value={address.city}
+                    onChange={e => setAddress({ ...address, city: e.target.value })}
+                    placeholder="City"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="block text-sm font-medium mb-1">Pincode</label>
+                  <input
+                    type="text"
+                    className="input w-full"
+                    value={address.pincode}
+                    onChange={e => setAddress({ ...address, pincode: e.target.value })}
+                    placeholder="Pincode"
+                  />
+                </div>
+              </div>
               <button
                 onClick={handleProceedToPayment}
                 disabled={loading}
