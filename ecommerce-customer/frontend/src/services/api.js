@@ -67,6 +67,7 @@ export const cartAPI = {
 export const checkoutAPI = {
   applyCoupon: (couponCode, amount) => api.post('/checkout/apply-coupon', { couponCode, amount }),
   createOrder: (orderData) => api.post('/checkout/create-order', orderData),
+  updateUserInfo: (userData) => api.put('/user/update', userData),
 };
 
 // Payment API

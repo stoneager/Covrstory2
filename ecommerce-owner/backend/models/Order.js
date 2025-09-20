@@ -6,6 +6,15 @@ const OrderSchema = new mongoose.Schema({
 		ref: 'User',
 		required: true
 	},
+	mobile: {
+		type: String
+	},
+	address: {
+		line1: String,
+		area: String,
+		city: String,
+		pincode: String
+	},
 	items: [{
 		productQuantity: {
 			type: mongoose.Schema.Types.ObjectId,

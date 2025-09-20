@@ -26,5 +26,6 @@ app.use('/api/checkout', require('./routes/checkout'));
 app.use('/api/payment', require('./routes/payment'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/returns', require('./routes/returns'));
+app.use('/api/user', require('./routes/users'));
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Customer backend running on port ${PORT}`));
