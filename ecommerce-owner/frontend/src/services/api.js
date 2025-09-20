@@ -10,6 +10,12 @@ export const packagesAPI = {
 	updateStatus: (id, status) => api.put(`/packages/${id}/status`, { status }),
 };
 
+// Returns API
+export const returnsAPI = {
+	getAll: (status) => api.get(`/returns${status ? `?status=${status}` : ''}`),
+	updateStatus: (id, status) => api.patch(`/returns/${id}/status`, { status }),
+};
+
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 const api = axios.create({
@@ -61,6 +67,13 @@ export const discountsAPI = {
 // Users API
 export const usersAPI = {
 	getAll: () => api.get('/users'),
+};
+
+export const authAPI = {
+  login: (credentials) => api.post('/auth/login', credentials),
+  verifyToken: (token) => api.get('/auth/verify', {
+	headers: { Authorization: `Bearer ${token}` }
+  }),
 };
 
 // Upload API

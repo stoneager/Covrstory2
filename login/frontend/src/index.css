@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 * {
   margin: 0;
@@ -13,31 +13,33 @@
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   background-color: #ffffff;
-  color: #1a1a1a;
+  color: #111827;
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Button Styles */
 .btn {
-  @apply inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-none transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-lg transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm;
 }
 
 .btn-primary {
-  @apply bg-black text-white hover:bg-gray-800 focus:ring-gray-500 border border-black;
+  @apply bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-500 border border-gray-900 hover:shadow-lg transform hover:-translate-y-0.5;
 }
 
 .btn-google {
-  @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500;
+  @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 hover:shadow-md transform hover:-translate-y-0.5;
 }
 
 /* Input Styles */
 .input {
-  @apply block w-full px-4 py-3 text-sm border border-gray-300 rounded-none placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-colors duration-200;
+  @apply block w-full px-4 py-3 text-sm border border-gray-200 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white;
 }
 
 /* Loading Spinner */
 .spinner {
-  @apply animate-spin rounded-full h-6 w-6 border-2 border-gray-300 border-t-black;
+  @apply animate-spin rounded-full h-6 w-6 border-2 border-gray-200 border-t-gray-900;
 }
 
 /* Animations */
@@ -54,4 +56,48 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Enhanced form styles */
+.form-enhanced {
+  @apply bg-white rounded-2xl shadow-xl border border-gray-100 p-8;
+}
+
+.input-enhanced {
+  @apply block w-full px-4 py-4 text-sm border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white font-medium;
+}
+
+.btn-enhanced {
+  @apply inline-flex items-center justify-center px-8 py-4 text-sm font-bold rounded-xl transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg;
+}
+
+.btn-primary-enhanced {
+  @apply bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-500 border border-gray-900 hover:shadow-xl transform hover:-translate-y-1;
+}
+
+.btn-google-enhanced {
+  @apply bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 hover:shadow-xl transform hover:-translate-y-1;
+}
+
+/* Custom focus styles */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2;
+}
+
+/* Enhanced typography */
+.heading-enhanced {
+  @apply text-4xl md:text-5xl font-black text-gray-900 tracking-tight;
+}
+
+.subheading-enhanced {
+  @apply text-lg text-gray-600 font-medium;
+}
+
+/* Loading states */
+.loading-enhanced {
+  @apply flex items-center justify-center space-x-2;
+}
+
+.spinner-enhanced {
+  @apply animate-spin rounded-full h-5 w-5 border-2 border-gray-200 border-t-gray-900;
 }

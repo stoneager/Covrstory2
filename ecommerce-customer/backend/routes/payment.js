@@ -69,16 +69,20 @@ router.post('/verify', auth, customerOnly, async (req, res) => {
       .update(body.toString())
       .digest('hex');
 
-    if (expectedSignature !== razorpay_signature) {
-      return res.status(400).json({ success: false, message: 'Invalid signature' });
-    }
-
     // Update order
     const order = await Order.findOne({ _id: orderId, user: req.user._id })
       .populate('items.productQuantity');
 
     if (!order) {
       return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    if (expectedSignature !== razorpay_signature) {
+      // Mark payment as failed on the same order
+      order.payment_status = 'failed';
+      order.stages = 'pending';
+      await order.save();
+      return res.status(400).json({ success: false, message: 'Invalid signature. Payment failed.' });
     }
 
     order.payment_status = 'completed';

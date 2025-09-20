@@ -136,7 +136,10 @@ const CollectionManagement = () => {
 	return (
 		<div>
 			<div className="card-header">
-				<h1 className="card-title">Collection Management</h1>
+				<div>
+					<h1 className="card-title">Collection Management</h1>
+					<p className="text-gray-600 text-lg mt-2">Organize your products into collections</p>
+				</div>
 				<button className="btn btn-primary" onClick={handleAddCollection}>
 					<FontAwesomeIcon icon={faPlus} />
 					Add Collection
@@ -177,11 +180,17 @@ const CollectionManagement = () => {
 			</div>
 
 			{collections.length === 0 && (
-				<div className="card">
-					<div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
-						No collections available. Create your first collection!
+				<div className="card text-center py-16">
+					<div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+						<FontAwesomeIcon icon={faLayerGroup} className="text-3xl text-gray-400" />
 					</div>
-				</div>
+					<h3 className="text-xl font-bold text-gray-900 mb-4">No collections yet</h3>
+					<p className="text-gray-600 mb-8">Create your first collection to organize your products</p>
+					<button className="btn btn-primary" onClick={handleAddCollection}>
+						<FontAwesomeIcon icon={faPlus} className="mr-2" />
+						Create Your First Collection
+					</button>
+					</div>
 			)}
 
 			{showModal && (
@@ -190,7 +199,7 @@ const CollectionManagement = () => {
 						<div className="modal-header">
 							<h2>{selectedCollection ? 'Edit Collection' : 'Add New Collection'}</h2>
 							<button className="btn btn-secondary" onClick={() => setShowModal(false)}>
-								<FontAwesomeIcon icon={faTrash} />
+								<FontAwesomeIcon icon={faTimes} />
 							</button>
 						</div>
             
@@ -201,6 +210,7 @@ const CollectionManagement = () => {
 									<input
 										type="text"
 										className="form-control"
+										placeholder="Enter collection name"
 										value={formData.name}
 										onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
 										required
@@ -215,16 +225,26 @@ const CollectionManagement = () => {
 										accept="image/*"
 										onChange={handleImageUpload}
 									/>
-									{uploading && <div style={{ color: '#007bff', marginTop: '10px' }}>Uploading image...</div>}
+									{uploading && (
+										<div className="flex items-center gap-2 mt-3 text-blue-600">
+											<div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+											<span className="text-sm font-medium">Uploading image...</span>
+										</div>
+									)}
 									{formData.image && !uploading && (
-										<div style={{ marginTop: '10px' }}>
+										<div className="mt-4">
 											<img 
 												src={formData.image} 
 												alt="Preview" 
-												style={{ width: '200px', height: '150px', objectFit: 'cover', borderRadius: '4px' }}
+												className="w-48 h-36 object-cover rounded-lg border border-gray-200"
 											/>
-											<div style={{ color: '#28a745', fontSize: '12px', marginTop: '5px' }}>
+											<div className="flex items-center gap-2 mt-2 text-green-600">
+												<svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+													<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+												</svg>
+												<span className="text-sm font-medium">
 												✓ Image uploaded successfully
+												</span>
 											</div>
 										</div>
 									)}
