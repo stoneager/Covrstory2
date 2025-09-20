@@ -7,6 +7,8 @@ import axios from 'axios';
 export const packagesAPI = {
 	getAll: () => api.get('/packages'),
 	create: (data) => api.post('/packages', data),
+	update: (id, data) => api.put(`/packages/${id}`, data),
+	delete: (id) => api.delete(`/packages/${id}`),
 	updateStatus: (id, status) => api.put(`/packages/${id}/status`, { status }),
 };
 
@@ -37,6 +39,7 @@ export const productsAPI = {
 	getById: (id) => api.get(`/products/${id}`),
 	create: (data) => api.post('/products', data),
 	updateQuantities: (id, quantities) => api.put(`/products/${id}/quantities`, { quantities }),
+	updateProduct: (id, data) => api.put(`/products/${id}`, data),
 	delete: (id) => api.delete(`/products/${id}`),
 };
 

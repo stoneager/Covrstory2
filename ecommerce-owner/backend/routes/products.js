@@ -117,6 +117,47 @@ router.put('/:id/quantities', dummyAuth, ownerOnly, async (req, res) => {
 	}
 });
 
+// Update entire product including basic info and variants
+router.put('/:id', dummyAuth, ownerOnly, async (req, res) => {
+	try {
+		const { collection, type, gender, activity, name, description, variants } = req.body;
+		
+		// Update basic product information
+		const product = await Product.findByIdAndUpdate(
+			req.params.id,
+			{ collection, type, gender, activity, name, description },
+			{ new: true }
+		);
+		
+		if (!product) {
+			return res.status(404).json({ message: 'Product not found' });
+		}
+		
+		// Delete existing product quantities
+		await ProductQuantity.deleteMany({ product: req.params.id });
+		
+		// Create new product quantities for each variant
+		const quantities = [];
+		for (const variant of variants) {
+			for (const size of variant.sizes) {
+				const productQuantity = new ProductQuantity({
+					product: req.params.id,
+					size: size.size,
+					qty: size.qty,
+					colour: variant.colour,
+					price: variant.price,
+					images: variant.images || []
+				});
+				quantities.push(await productQuantity.save());
+			}
+		}
+		
+		res.json({ product, quantities });
+	} catch (error) {
+		res.status(500).json({ message: error.message });
+	}
+});
+
 // Delete product
 router.delete('/:id', dummyAuth, ownerOnly, async (req, res) => {
 	try {
