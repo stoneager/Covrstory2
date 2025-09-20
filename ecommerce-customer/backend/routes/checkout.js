@@ -70,7 +70,7 @@ router.post('/apply-coupon', auth, customerOnly, async (req, res) => {
 // Create order
 router.post('/create-order', auth, customerOnly, async (req, res) => {
   try {
-    const { items, subtotal, couponCode, discount, total } = req.body;
+    const { items, subtotal, couponCode, discount, total,address,mobile } = req.body;
 
     // Verify cart items and stock
     const cart = await Cart.findOne({ user: req.user._id })
@@ -114,6 +114,12 @@ router.post('/create-order', auth, customerOnly, async (req, res) => {
     if (existingOrder) {
       // Optionally update items if cart changed
       existingOrder.items = orderItems;
+      existingOrder.mobile = mobile;
+      existingOrder.address = address;
+      existingOrder.total_mrp = subtotal;
+      existingOrder.coupon_code = couponCode || null;
+      existingOrder.discount_amount = discount || 0;
+      existingOrder.final_amount = total;
       await existingOrder.save();
       order = existingOrder;
     } else {
@@ -126,8 +132,8 @@ router.post('/create-order', auth, customerOnly, async (req, res) => {
         final_amount: total,
         stages: 'pending',
         payment_status: 'pending',
-        mobile: req.user.mobile,
-        address: req.user.address
+        mobile: mobile,
+        address: address
       });
       await order.save();
     }
@@ -145,14 +151,16 @@ router.post('/create-order', auth, customerOnly, async (req, res) => {
       user: {
         name: req.user.name,
         email: req.user.email,
-        mobile: req.user.mobile,
-        address: req.user.address
+        mobile: mobile,
+        address: address
       },
       order: {
-        mobile: order.mobile,
-        address: order.address
+        mobile: mobile,
+        address: address
       }
     });
+    console.log('Order Created:', order._id);
+    console.log('Address:', order.address);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

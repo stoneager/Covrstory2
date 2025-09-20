@@ -27,9 +27,7 @@ router.post('/product-presigned', dummyAuth, ownerOnly, async (req, res) => {
 // Get presigned URL for collection image upload
 router.post('/collection-presigned', dummyAuth, ownerOnly, async (req, res) => {
 	try {
-		console.log('collection-presigned req.body:', req.body);
-		console.log('S3_BUCKET from env:', process.env.S3_BUCKET_NAME);
-		console.log('AWS_REGION from env:', process.env.AWS_REGION);
+		
 		
 		const { collectionName, filename, contentType } = req.body;
 		
@@ -42,11 +40,11 @@ router.post('/collection-presigned', dummyAuth, ownerOnly, async (req, res) => {
 		const sanitizedFilename = decodeURIComponent(filename).replace(/[^a-zA-Z0-9.-]/g, '_');
 		const key = `collections/${sanitizedCollectionName}/${sanitizedFilename}`;
 		
-		console.log('Sanitized S3 key:', key);
+		
 		
 		const url = await getPresignedUrl({ key, contentType });
 		
-		console.log('Generated presigned URL:', url);
+		
 		
 		res.json({ url, key });
 	} catch (error) {

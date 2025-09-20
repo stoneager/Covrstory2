@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
 // Create collection
 router.post('/', dummyAuth, ownerOnly, async (req, res) => {
 	try {
-		console.log('Collection POST req.body:', req.body);
+		
 		if (!req.is('application/json')) {
 			return res.status(400).json({ message: 'Request body must be JSON.' });
 		}

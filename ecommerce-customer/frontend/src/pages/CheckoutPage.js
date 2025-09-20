@@ -83,6 +83,7 @@ const CheckoutPage = () => {
         mobile,
         address
       };
+      console.log('Checkout Payload:', checkoutPayload);
       const response = await checkoutAPI.createOrder(checkoutPayload);
       // Navigate to payment page with checkout data
       navigate('/payment', { 

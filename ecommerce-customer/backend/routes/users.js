@@ -16,6 +16,7 @@ router.put('/update', auth, async (req, res) => {
       { mobile, address },
       { new: true }
     );
+    
     if (!updatedUser) return res.status(404).json({ message: 'User not found.' });
     res.json({ message: 'User info updated successfully.', user: updatedUser });
   } catch (err) {
