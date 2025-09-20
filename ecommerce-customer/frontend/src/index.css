@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 * {
   margin: 0;
@@ -13,8 +13,10 @@
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   background-color: #ffffff;
-  color: #1a1a1a;
+  color: #111827;
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Custom scrollbar */
@@ -23,37 +25,37 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #f8fafc;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: #cbd5e1;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: #94a3b8;
 }
 
 /* Button Components */
 .btn {
-  @apply inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-none transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-lg transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm;
 }
 
 .btn-primary {
-  @apply bg-black text-white hover:bg-gray-800 focus:ring-gray-500 border border-black;
+  @apply bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-500 border border-gray-900 hover:shadow-lg transform hover:-translate-y-0.5;
 }
 
 .btn-secondary {
-  @apply bg-white text-black border border-black hover:bg-black hover:text-white focus:ring-gray-500;
+  @apply bg-white text-gray-900 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 focus:ring-gray-500 hover:shadow-md;
 }
 
 .btn-outline {
-  @apply bg-transparent text-black border border-gray-300 hover:border-black hover:bg-black hover:text-white focus:ring-gray-500;
+  @apply bg-transparent text-gray-900 border border-gray-300 hover:border-gray-900 hover:bg-gray-900 hover:text-white focus:ring-gray-500;
 }
 
 .btn-danger {
-  @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 border border-red-600;
+  @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 border border-red-600 hover:shadow-lg;
 }
 
 .btn-sm {
@@ -61,50 +63,50 @@ body {
 }
 
 .btn-lg {
-  @apply px-8 py-4 text-base;
+  @apply px-8 py-4 text-base font-semibold;
 }
 
 /* Card Components */
 .card {
-  @apply bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300;
+  @apply bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 rounded-xl;
 }
 
 .card-minimal {
-  @apply bg-white;
+  @apply bg-white rounded-xl;
 }
 
 /* Input Components */
 .input {
-  @apply block w-full px-4 py-3 text-sm border border-gray-300 rounded-none placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-colors duration-200;
+  @apply block w-full px-4 py-3 text-sm border border-gray-200 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white;
 }
 
 .input-error {
-  @apply border-red-500 focus:ring-red-500 focus:border-red-500;
+  @apply border-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50;
 }
 
 /* Typography */
 .heading-xl {
-  @apply text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight;
+  @apply text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900;
 }
 
 .heading-lg {
-  @apply text-3xl md:text-4xl font-bold tracking-tight;
+  @apply text-3xl md:text-4xl font-bold tracking-tight text-gray-900;
 }
 
 .heading-md {
-  @apply text-2xl md:text-3xl font-semibold tracking-tight;
+  @apply text-2xl md:text-3xl font-semibold tracking-tight text-gray-900;
 }
 
 .heading-sm {
-  @apply text-xl md:text-2xl font-semibold;
+  @apply text-xl md:text-2xl font-semibold text-gray-900;
 }
 
 .text-body {
-  @apply text-base text-gray-700 leading-relaxed;
+  @apply text-base text-gray-600 leading-relaxed;
 }
 
 .text-small {
-  @apply text-sm text-gray-600;
+  @apply text-sm text-gray-500;
 }
 
 /* Layout Components */
@@ -166,7 +168,7 @@ body {
 }
 
 .image-zoom {
-  @apply overflow-hidden;
+  @apply overflow-hidden rounded-lg;
 }
 
 .image-zoom img {
@@ -179,7 +181,7 @@ body {
 
 /* Badge */
 .badge {
-  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
 }
 
 .badge-success {
@@ -198,9 +200,17 @@ body {
   @apply bg-blue-100 text-blue-800;
 }
 
+.badge-primary {
+  @apply bg-gray-100 text-gray-800;
+}
+
+.badge-secondary {
+  @apply bg-gray-100 text-gray-600;
+}
+
 /* Loading Spinner */
 .spinner {
-  @apply animate-spin rounded-full h-8 w-8 border-2 border-gray-300 border-t-black;
+  @apply animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-gray-900;
 }
 
 .spinner-lg {
@@ -228,28 +238,141 @@ body {
 
 /* Quantity Selector */
 .quantity-selector {
-  @apply flex items-center border border-gray-300;
+  @apply flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white;
 }
 
 .quantity-selector button {
-  @apply w-10 h-10 flex items-center justify-center border-none bg-white hover:bg-gray-50 transition-colors duration-200 text-gray-600 hover:text-black;
+  @apply w-10 h-10 flex items-center justify-center border-none bg-white hover:bg-gray-50 transition-colors duration-200 text-gray-600 hover:text-gray-900;
 }
 
 .quantity-selector input {
-  @apply w-16 h-10 text-center border-none focus:outline-none focus:ring-0 text-sm font-medium;
+  @apply w-16 h-10 text-center border-none focus:outline-none focus:ring-0 text-sm font-medium bg-white;
 }
 
 /* Price Display */
 .price-original {
-  @apply text-gray-500 line-through text-sm;
+  @apply text-gray-400 line-through text-sm;
 }
 
 .price-sale {
-  @apply text-black font-semibold;
+  @apply text-gray-900 font-semibold;
 }
 
 .price-discount {
   @apply text-red-600 font-medium text-sm;
+}
+
+/* Enhanced Product Card Styles */
+.product-card-enhanced {
+  @apply bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-gray-100;
+}
+
+.product-card-enhanced:hover {
+  transform: translateY(-4px);
+}
+
+.product-image-container {
+  @apply relative overflow-hidden bg-gray-50;
+  aspect-ratio: 3/4;
+}
+
+.product-image-container img {
+  @apply w-full h-full object-cover transition-transform duration-500 group-hover:scale-105;
+}
+
+.product-overlay {
+  @apply absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center;
+}
+
+.product-quick-actions {
+  @apply opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex gap-2;
+}
+
+.product-info-enhanced {
+  @apply p-6 space-y-3;
+}
+
+.product-category {
+  @apply text-xs text-gray-500 uppercase tracking-wide font-medium;
+}
+
+.product-title {
+  @apply font-semibold text-gray-900 text-lg leading-tight group-hover:text-gray-700 transition-colors duration-200;
+}
+
+.product-price-container {
+  @apply flex items-center space-x-2;
+}
+
+.product-price-current {
+  @apply text-xl font-bold text-gray-900;
+}
+
+.product-price-original {
+  @apply text-sm text-gray-400 line-through;
+}
+
+.product-discount-badge {
+  @apply bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded-full;
+}
+
+/* Enhanced Header Styles */
+.header-enhanced {
+  @apply bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 shadow-sm;
+}
+
+.header-content {
+  @apply flex items-center justify-between h-16 md:h-20;
+}
+
+.logo-enhanced {
+  @apply text-2xl md:text-3xl font-black text-gray-900 tracking-tight;
+}
+
+.nav-enhanced {
+  @apply hidden md:flex items-center space-x-8;
+}
+
+.nav-link-enhanced {
+  @apply text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors duration-200 tracking-wide uppercase relative;
+}
+
+.nav-link-enhanced::after {
+  content: '';
+  @apply absolute bottom-0 left-0 w-0 h-0.5 bg-gray-900 transition-all duration-300;
+}
+
+.nav-link-enhanced:hover::after {
+  @apply w-full;
+}
+
+/* Enhanced Footer Styles */
+.footer-enhanced {
+  @apply bg-gray-900 text-white;
+}
+
+.footer-content {
+  @apply py-16;
+}
+
+.footer-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8;
+}
+
+.footer-section h3 {
+  @apply text-lg font-semibold mb-6 text-white;
+}
+
+.footer-section ul {
+  @apply space-y-3;
+}
+
+.footer-section a {
+  @apply text-gray-300 hover:text-white transition-colors duration-200 text-sm;
+}
+
+.footer-bottom {
+  @apply border-t border-gray-800 py-8;
 }
 
 /* Responsive utilities */
@@ -265,4 +388,43 @@ body {
   .heading-lg {
     @apply text-2xl;
   }
+}
+
+/* Custom focus styles */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2;
+}
+
+/* Enhanced form styles */
+.form-group-enhanced {
+  @apply space-y-2;
+}
+
+.form-label-enhanced {
+  @apply block text-sm font-medium text-gray-700;
+}
+
+.form-input-enhanced {
+  @apply block w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200 bg-white;
+}
+
+/* Enhanced modal styles */
+.modal-overlay-enhanced {
+  @apply fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4;
+}
+
+.modal-content-enhanced {
+  @apply bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto;
+}
+
+.modal-header-enhanced {
+  @apply px-6 py-4 border-b border-gray-100;
+}
+
+.modal-body-enhanced {
+  @apply px-6 py-4;
+}
+
+.modal-footer-enhanced {
+  @apply px-6 py-4 border-t border-gray-100 flex justify-end space-x-3;
 }

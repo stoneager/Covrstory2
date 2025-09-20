@@ -40,15 +40,15 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="sidebar flex flex-col h-screen justify-between bg-gray-900 text-white">
+    <div className="sidebar">
       {/* Menu Items */}
-      <ul className="sidebar-menu space-y-2 p-4">
+      <ul className="sidebar-menu">
         {menuItems.map((item) => (
           <li 
             key={item.path} 
-            className={`sidebar-item ${location.pathname === item.path ? 'bg-gray-800 rounded' : ''}`}
+            className={`sidebar-item ${location.pathname === item.path ? 'active' : ''}`}
           >
-            <Link to={item.path} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-800 rounded">
+            <Link to={item.path}>
               <FontAwesomeIcon icon={item.icon} />
               <span>{item.label}</span>
             </Link>
@@ -57,10 +57,10 @@ const Sidebar = () => {
       </ul>
 
       {/* Logout Button */}
-      <div className="p-4 border-t border-gray-700">
+      <div className="px-6 py-8 border-t border-gray-200 mt-auto">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded bg-red-600 hover:bg-red-700 transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-200 font-semibold"
         >
           <FontAwesomeIcon icon={faSignOutAlt} />
           <span>Logout</span>
