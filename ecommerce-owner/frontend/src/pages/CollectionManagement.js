@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faLayerGroup , faTimes , faPlus, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { collectionsAPI, uploadAPI } from '../services/api';
 
 const CollectionManagement = () => {
