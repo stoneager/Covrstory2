@@ -31,6 +31,7 @@ const OrderTracking = () => {
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [creating, setCreating] = useState(false);
+  const [viewOrder, setViewOrder] = useState(null);
   const [updating, setUpdating] = useState(false);
   const [sortBy, setSortBy] = useState('date');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -177,22 +178,22 @@ const OrderTracking = () => {
   };
 
   return (
-    <div className="space-y-6">
+  <div className="ordertracking-wrapper">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Order Tracking & Packages</h1>
-          <p className="text-gray-600 mt-1">Manage order packages and track shipments</p>
+  <div className="ordertracking-header">
+        <div className="ordertracking-title-group">
+          <h1 className="ordertracking-title">Order Tracking & Packages</h1>
+          <p className="ordertracking-subtitle">Manage order packages and track shipments</p>
         </div>
         
-        <div className="flex items-center gap-4">
+  <div className="ordertracking-filters">
           {/* Filters */}
-          <div className="flex items-center gap-2">
-            <FontAwesomeIcon icon={faFilter} className="text-gray-500" />
+          <div className="ordertracking-filter-group">
+            <FontAwesomeIcon icon={faFilter} className="ordertracking-filter-icon" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="ordertracking-select"
             >
               <option value="all">All Status</option>
               {statusOptions.map(option => (
@@ -202,12 +203,12 @@ const OrderTracking = () => {
           </div>
           
           {/* Sort */}
-          <div className="flex items-center gap-2">
-            <FontAwesomeIcon icon={faSort} className="text-gray-500" />
+          <div className="ordertracking-filter-group">
+            <FontAwesomeIcon icon={faSort} className="ordertracking-filter-icon" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="ordertracking-select"
             >
               <option value="date">Sort by Date</option>
               <option value="status">Sort by Status</option>
@@ -217,7 +218,7 @@ const OrderTracking = () => {
           
           <button 
             onClick={() => setShowCreateModal(true)}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2 font-medium"
+            className="ordertracking-create-btn"
           >
             <FontAwesomeIcon icon={faPlus} />
             Create Package
@@ -226,67 +227,67 @@ const OrderTracking = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between">
+  <div className="ordertracking-stats-grid">
+  <div className="ordertracking-stat-card">
+          <div className="ordertracking-stat-card-row">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Packages</p>
               <p className="text-2xl font-bold text-gray-900">{packages.length}</p>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <FontAwesomeIcon icon={faBox} className="text-blue-600 text-xl" />
+            <div className="ordertracking-stat-icon ordertracking-stat-icon-blue">
+              <FontAwesomeIcon icon={faBox} />
             </div>
           </div>
         </div>
         
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between">
+  <div className="ordertracking-stat-card">
+          <div className="ordertracking-stat-card-row">
             <div>
               <p className="text-sm font-medium text-gray-600">Available Orders</p>
               <p className="text-2xl font-bold text-gray-900">{availableOrders.length}</p>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <FontAwesomeIcon icon={faShoppingCart} className="text-green-600 text-xl" />
+            <div className="ordertracking-stat-icon ordertracking-stat-icon-green">
+              <FontAwesomeIcon icon={faShoppingCart} />
             </div>
           </div>
         </div>
         
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between">
+  <div className="ordertracking-stat-card">
+          <div className="ordertracking-stat-card-row">
             <div>
               <p className="text-sm font-medium text-gray-600">Pending Packages</p>
               <p className="text-2xl font-bold text-gray-900">
                 {packages.filter(pkg => pkg.stages === 'pending').length}
               </p>
             </div>
-            <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-              <FontAwesomeIcon icon={faCalendar} className="text-yellow-600 text-xl" />
+            <div className="ordertracking-stat-icon ordertracking-stat-icon-yellow">
+              <FontAwesomeIcon icon={faCalendar} />
             </div>
           </div>
         </div>
         
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between">
+  <div className="ordertracking-stat-card">
+          <div className="ordertracking-stat-card-row">
             <div>
               <p className="text-sm font-medium text-gray-600">Delivered</p>
               <p className="text-2xl font-bold text-gray-900">
                 {packages.filter(pkg => pkg.stages === 'delivered').length}
               </p>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <FontAwesomeIcon icon={faBox} className="text-green-600 text-xl" />
+            <div className="ordertracking-stat-icon ordertracking-stat-icon-green">
+              <FontAwesomeIcon icon={faBox} />
             </div>
           </div>
         </div>
       </div>
 
       {/* Packages Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="package-grid">
         {packages.map(pkg => (
-          <div key={pkg._id} className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
-            <div className="p-6">
+          <div key={pkg._id} className="package-card">
+            <div className="package-info">
               {/* Package Header */}
-              <div className="flex items-start justify-between mb-4">
+              <div className="package-header">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">
                     Package #{pkg._id.slice(-8)}
@@ -295,16 +296,16 @@ const OrderTracking = () => {
                     Created {new Date(pkg.createdAt).toLocaleDateString()}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="package-actions">
                   <button
                     onClick={() => handleEditPackage(pkg)}
-                    className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                    className="btn btn-primary btn-sm"
                   >
                     <FontAwesomeIcon icon={faEdit} />
                   </button>
                   <button
                     onClick={() => handleDeletePackage(pkg._id)}
-                    className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                    className="btn btn-danger btn-sm"
                   >
                     <FontAwesomeIcon icon={faTrash} />
                   </button>
@@ -312,12 +313,12 @@ const OrderTracking = () => {
               </div>
 
               {/* Status */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <div className="package-status-row">
+                <label className="package-status-label">Status</label>
                 <select
                   value={pkg.stages}
                   onChange={(e) => handleStatusChange(pkg._id, e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="package-status-select"
                 >
                   {statusOptions.map(option => (
                     <option key={option.value} value={option.value}>{option.label}</option>
@@ -326,29 +327,30 @@ const OrderTracking = () => {
               </div>
 
               {/* Package Summary */}
-              <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">Package Summary</p>
-                <p className="text-sm text-gray-600">{getOrderSummary(pkg.orders)}</p>
+              <div className="package-summary">
+                <p className="package-summary-label">Package Summary</p>
+                <p className="package-summary-value">{getOrderSummary(pkg.orders)}</p>
               </div>
 
               {/* Orders List */}
-              <div>
-                <p className="text-sm font-medium text-gray-700 mb-3">Orders in Package</p>
+              <div className="package-orders-list">
+                <p className="package-orders-label">Orders in Package</p>
                 {pkg.orders && pkg.orders.length > 0 ? (
-                  <div className="space-y-2 max-h-40 overflow-y-auto">
+                  <div className="package-orders-scroll">
                     {pkg.orders.map(order => (
-                      <div key={order._id} className="bg-gray-50 rounded-lg p-3">
-                        <div className="flex items-center justify-between">
+                      <div key={order._id} className="package-order-card">
+                        <div className="package-order-row">
                           <div>
                             <p className="text-sm font-medium text-gray-900">
                               #{order._id.slice(-8)}
                             </p>
                             <p className="text-xs text-gray-600">
                               <FontAwesomeIcon icon={faUser} className="mr-1" />
-                              {order.user?.name || 'Unknown Customer'}
+                              {order.user?.username || order.user?.name || order.customerName || order.user?.email || 'Unknown Customer'}
+                              {order.user?.email ? ` • ${order.user.email}` : ''}
                             </p>
                           </div>
-                          <div className="text-right">
+                          <div className="package-order-right">
                             <p className="text-sm font-medium text-gray-900">
                               ₹{order.total_mrp?.toLocaleString() || 0}
                             </p>
@@ -361,7 +363,7 @@ const OrderTracking = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-500 italic">No orders in this package</p>
+                  <p className="package-orders-empty">No orders in this package</p>
                 )}
               </div>
             </div>
@@ -370,15 +372,15 @@ const OrderTracking = () => {
       </div>
 
       {packages.length === 0 && (
-        <div className="text-center py-12">
-          <div className="w-24 h-24 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <FontAwesomeIcon icon={faBox} className="text-4xl text-gray-400" />
+        <div className="ordertracking-empty-state">
+          <div className="ordertracking-empty-icon">
+            <FontAwesomeIcon icon={faBox} />
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">No packages yet</h3>
-          <p className="text-gray-600 mb-6">Create your first package to start tracking orders</p>
+          <h3 className="ordertracking-empty-title">No packages yet</h3>
+          <p className="ordertracking-empty-desc">Create your first package to start tracking orders</p>
           <button 
             onClick={() => setShowCreateModal(true)}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
+            className="ordertracking-create-btn"
           >
             Create First Package
           </button>
@@ -387,91 +389,95 @@ const OrderTracking = () => {
 
       {/* Create Package Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900">Create New Package</h2>
-              <button
-                onClick={() => setShowCreateModal(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-              >
-                <FontAwesomeIcon icon={faTimes} className="text-gray-600" />
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>Create New Package</h2>
+              <button className="modal-close" onClick={() => setShowCreateModal(false)}>
+                <FontAwesomeIcon icon={faTimes} />
               </button>
             </div>
-            
-            <div className="p-6">
-              <div className="mb-4">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Select Orders ({availableOrders.length} available)
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Only orders with completed payment and not already in packages are shown
-                </p>
-              </div>
-              
-              <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg">
-                {availableOrders.length > 0 ? (
-                  <div className="divide-y divide-gray-200">
-                    {availableOrders.map(order => (
-                      <label key={order._id} className="flex items-center p-4 hover:bg-gray-50 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          value={order._id}
-                          checked={selectedOrders.includes(order._id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedOrders([...selectedOrders, order._id]);
-                            } else {
-                              setSelectedOrders(selectedOrders.filter(id => id !== order._id));
-                            }
-                          }}
-                          className="mr-4 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="font-medium text-gray-900">#{order._id.slice(-8)}</p>
-                              <p className="text-sm text-gray-600">
-                                {order.user?.name || 'Unknown Customer'} • {order.user?.email}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {new Date(order.createdAt).toLocaleDateString()} • {order.items?.length || 0} items
-                              </p>
+            <div className="modal-body">
+              <div className="form-section">
+                <h3 className="form-section-title">Select Orders ({availableOrders.length} available)</h3>
+                <p className="form-label">Only orders with completed payment and not already in packages are shown</p>
+                <div className="order-list">
+                  {availableOrders.length > 0 ? (
+                    <div>
+                      {availableOrders.map(order => (
+                        <div key={order._id} className="order-row">
+                          <input
+                            type="checkbox"
+                            value={order._id}
+                            checked={selectedOrders.includes(order._id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedOrders([...selectedOrders, order._id]);
+                              } else {
+                                setSelectedOrders(selectedOrders.filter(id => id !== order._id));
+                              }
+                            }}
+                            className="order-checkbox"
+                          />
+                          <div className="order-details">
+                            <div className="order-id">#{order._id.slice(-8)}</div>
+                            <div className="order-customer">
+                              {order.user?.username || order.user?.name || order.customerName || order.user?.email || 'Unknown Customer'}
+                              {order.user?.email ? ` • ${order.user.email}` : ''}
                             </div>
-                            <div className="text-right">
-                              <p className="font-medium text-gray-900">₹{order.total_mrp?.toLocaleString() || 0}</p>
-                              <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.stages)}`}>
-                                {order.stages}
-                              </span>
+                            <div className="order-meta">
+                              {new Date(order.createdAt).toLocaleDateString()} • {order.items?.length || 0} items
                             </div>
                           </div>
+                          <div className="order-right">
+                            <div className="order-price">₹{order.total_mrp?.toLocaleString() || 0}</div>
+                            <span className={`order-status ${getStatusColor(order.stages)}`}>{order.stages}</span>
+                            <button type="button" className="btn btn-secondary" style={{marginLeft:8}} onClick={() => setViewOrder(order)}>
+                              View
+                            </button>
+                          </div>
                         </div>
-                      </label>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="p-8 text-center text-gray-500">
-                    <FontAwesomeIcon icon={faShoppingCart} className="text-4xl mb-4" />
-                    <p>No available orders to package</p>
-                  </div>
-                )}
+                      ))}
+      {viewOrder && (
+        <div className="modal-overlay" style={{zIndex:10000}}>
+          <div className="modal-content" style={{maxWidth:'400px', minWidth:'320px', maxHeight:'340px'}}>
+            <div className="modal-header">
+              <h2 style={{fontSize:'18px'}}>Order Details</h2>
+              <button className="modal-close" onClick={() => setViewOrder(null)}>
+                <FontAwesomeIcon icon={faTimes} />
+              </button>
+            </div>
+            <div className="modal-body" style={{padding:'18px'}}>
+              <div className="order-details-modal" style={{fontSize:'14px', padding:'0'}}>
+                <div><strong>Name:</strong> {viewOrder.user?.name || viewOrder.user?.username || viewOrder.customerName || 'Unknown'}</div>
+                <div><strong>Email:</strong> {viewOrder.user?.email || 'Unknown'}</div>
+                <div><strong>Address:</strong> {viewOrder.address?.line1 || ''}{viewOrder.address?.area ? ', ' + viewOrder.address.area : ''}{viewOrder.address?.city ? ', ' + viewOrder.address.city : ''}{viewOrder.address?.pincode ? ' - ' + viewOrder.address.pincode : ''}</div>
+                <div style={{marginTop:'10px'}}><strong>Products:</strong> {viewOrder.items?.map(item => item.productName).filter(Boolean).join(', ') || 'None'}</div>
               </div>
             </div>
-            
-            <div className="flex items-center justify-end gap-4 p-6 border-t border-gray-200">
-              <button
-                onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
-              >
+            <div className="modal-footer" style={{padding:'0 18px 18px 18px'}}>
+              <button type="button" className="btn btn-secondary" onClick={() => setViewOrder(null)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+                    </div>
+                  ) : (
+                    <div className="order-empty">
+                      <FontAwesomeIcon icon={faShoppingCart} className="order-empty-icon" />
+                      <p>No available orders to package</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>
                 Cancel
               </button>
-              <button
-                onClick={handleCreatePackage}
-                disabled={creating || selectedOrders.length === 0}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center gap-2"
-              >
-                {creating && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>}
-                }
+              <button type="button" className="btn btn-primary" onClick={handleCreatePackage} disabled={creating || selectedOrders.length === 0}>
                 {creating ? 'Creating...' : `Create Package (${selectedOrders.length})`}
               </button>
             </div>
@@ -481,33 +487,22 @@ const OrderTracking = () => {
 
       {/* Edit Package Modal */}
       {showEditModal && selectedPackage && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900">
-                Edit Package #{selectedPackage._id.slice(-8)}
-              </h2>
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-              >
-                <FontAwesomeIcon icon={faTimes} className="text-gray-600" />
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>Edit Package #{selectedPackage._id.slice(-8)}</h2>
+              <button className="modal-close" onClick={() => setShowEditModal(false)}>
+                <FontAwesomeIcon icon={faTimes} />
               </button>
             </div>
-            
-            <div className="p-6">
-              <div className="mb-4">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Manage Orders</h3>
-                <p className="text-sm text-gray-600">
-                  Add or remove orders from this package
-                </p>
-              </div>
-              
-              <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg">
-                <div className="divide-y divide-gray-200">
+            <div className="modal-body">
+              <div className="form-section">
+                <h3 className="form-section-title">Manage Orders</h3>
+                <p className="form-label">Add or remove orders from this package</p>
+                <div className="order-list">
                   {/* Current orders in package */}
                   {selectedPackage.orders?.map(order => (
-                    <label key={order._id} className="flex items-center p-4 hover:bg-gray-50 cursor-pointer bg-blue-50">
+                    <label key={order._id} className="order-row order-row-current">
                       <input
                         type="checkbox"
                         value={order._id}
@@ -519,28 +514,25 @@ const OrderTracking = () => {
                             setSelectedOrders(selectedOrders.filter(id => id !== order._id));
                           }
                         }}
-                        className="mr-4 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        className="order-checkbox"
                       />
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium text-gray-900">#{order._id.slice(-8)}</p>
-                            <p className="text-sm text-gray-600">
-                              {order.user?.name || 'Unknown Customer'}
-                            </p>
-                            <p className="text-xs text-blue-600 font-medium">Currently in package</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium text-gray-900">₹{order.total_mrp?.toLocaleString() || 0}</p>
-                          </div>
+                      <div className="order-details">
+                        <div className="order-id">#{order._id.slice(-8)}</div>
+                        <div className="order-customer">
+                          {order.user?.username || order.user?.name || order.customerName || order.user?.email || 'Unknown Customer'}
                         </div>
+                        <div className="order-meta">
+                          <span className="order-meta-status">Currently in package</span>
+                        </div>
+                      </div>
+                      <div className="order-right">
+                        <div className="order-price">₹{order.total_mrp?.toLocaleString() || 0}</div>
                       </div>
                     </label>
                   ))}
-                  
                   {/* Available orders */}
                   {availableOrders.map(order => (
-                    <label key={order._id} className="flex items-center p-4 hover:bg-gray-50 cursor-pointer">
+                    <label key={order._id} className="order-row">
                       <input
                         type="checkbox"
                         value={order._id}
@@ -552,42 +544,30 @@ const OrderTracking = () => {
                             setSelectedOrders(selectedOrders.filter(id => id !== order._id));
                           }
                         }}
-                        className="mr-4 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        className="order-checkbox"
                       />
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium text-gray-900">#{order._id.slice(-8)}</p>
-                            <p className="text-sm text-gray-600">
-                              {order.user?.name || 'Unknown Customer'}
-                            </p>
-                            <p className="text-xs text-gray-500">Available to add</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium text-gray-900">₹{order.total_mrp?.toLocaleString() || 0}</p>
-                          </div>
+                      <div className="order-details">
+                        <div className="order-id">#{order._id.slice(-8)}</div>
+                        <div className="order-customer">
+                          {order.user?.username || order.user?.name || order.customerName || order.user?.email || 'Unknown Customer'}
                         </div>
+                        <div className="order-meta">
+                          <span className="order-meta-status">Available to add</span>
+                        </div>
+                      </div>
+                      <div className="order-right">
+                        <div className="order-price">₹{order.total_mrp?.toLocaleString() || 0}</div>
                       </div>
                     </label>
                   ))}
                 </div>
               </div>
             </div>
-            
-            <div className="flex items-center justify-end gap-4 p-6 border-t border-gray-200">
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
-              >
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={() => setShowEditModal(false)}>
                 Cancel
               </button>
-              <button
-                onClick={handleUpdatePackage}
-                disabled={updating}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center gap-2"
-              >
-                {updating && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>}
-                }
+              <button type="button" className="btn btn-primary" onClick={handleUpdatePackage} disabled={updating}>
                 {updating ? 'Updating...' : `Update Package (${selectedOrders.length})`}
               </button>
             </div>

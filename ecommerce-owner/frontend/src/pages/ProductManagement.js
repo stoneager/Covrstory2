@@ -79,40 +79,31 @@ const ProductManagement = () => {
 	};
 	return (
 		<div>
-			<div className="card-header">
+			<div className="page-header">
 				<div>
-					<h1 className="card-title">Product Management</h1>
-					<p className="text-gray-600 text-lg mt-2">Manage your product catalog and inventory</p>
+					<h1 className="page-title">Product Management</h1>
+					<p className="page-subtitle">Manage your product catalog and inventory</p>
 				</div>
 				<button className="btn btn-primary" onClick={handleAddProduct}>
-					<FontAwesomeIcon icon={faPlus} />
+					<FontAwesomeIcon icon={faPlus} className="icon-left" />
 					Add Product
 				</button>
 			</div>
 			
-			<div className="card">
-				<div className="mb-6">
-					<div className="form-group" style={{ marginBottom: '0', maxWidth: '400px' }}>
-						<label className="form-label">Search Products</label>
-						<div style={{ position: 'relative' }}>
-							<input 
-								type="text" 
-								className="form-control" 
-								placeholder="Search by name, collection, or category..."
-							    value={searchTerm}
-								onChange={(e) => setSearchTerm(e.target.value)}
-								style={{ paddingLeft: '35px' }}
-							/>
-							<FontAwesomeIcon 
-								icon={faSearch} 
-								style={{ 
-									position: 'absolute', 
-									left: '12px', 
-									top: '50%', 
-									transform: 'translateY(-50%)',
-									color: '#94a3b8'
-								}} 
-							/>
+			<div className="search-section">
+				<div className="search-container">
+					<div className="search-input-wrapper">
+						<FontAwesomeIcon 
+							icon={faSearch} 
+							className="search-icon"
+						/>
+						<input 
+							type="text" 
+							className="search-input" 
+							placeholder="Search by name, collection, or category..."
+							value={searchTerm}
+							onChange={(e) => setSearchTerm(e.target.value)}
+						/>
 						</div>
 					</div>
 				</div>
@@ -125,53 +116,70 @@ const ProductManagement = () => {
 					<div className="product-grid">
 						{products.map(product => (
 							<div key={product._id} className="product-card">
-								{/* Image previews grouped by color/variant */}
+								<div className="product-header">
+									<h3 className="product-name">{product.name}</h3>
+									<p className="product-description">{product.description}</p>
+								</div>
+
 								{product.variants && product.variants.length > 0 && (
-									<div style={{ marginBottom: '16px' }}>
+									<div className="product-images">
 										{product.variants.map((variant, vIdx) => (
-											<div key={vIdx} style={{ marginBottom: '12px' }}>
-												<div style={{ fontWeight: '600', fontSize: '12px', marginBottom: '6px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+											<div key={vIdx} className="product-variant">
+												<div className="variant-label">
 													Color: {variant.colour}
 												</div>
-												<div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+												<div className="images-grid">
 													{variant.images && variant.images.length > 0 ? (
 														variant.images.map((img, imgIdx) => (
 															<img
 																key={imgIdx}
 																src={img}
 																alt={`${product.name} ${variant.colour} ${imgIdx + 1}`}
-																style={{ width: '64px', height: '64px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+																className="product-image"
 															/>
 														))
 													) : (
-														<span style={{ color: '#94a3b8', fontSize: '12px', fontWeight: '500' }}>No images</span>
+														<span className="no-image-text">No images available</span>
 													)}
 												</div>
 											</div>
 										))}
 									</div>
 								)}
+
 								<div className="product-info">
-									<h3 className="product-name">{product.name}</h3>
-									<p className="product-description">{product.description}</p>
-									<div style={{ fontSize: '12px', color: '#64748b', marginBottom: '16px', lineHeight: '1.5' }}>
-										<div style={{ marginBottom: '4px' }}><strong>Collection:</strong> {product.collection?.name}</div>
-										<div style={{ marginBottom: '4px' }}><strong>Category:</strong> {product.type} | {product.gender === 'm' ? 'Men' : 'Women'}</div>
-										<div><strong>Activity:</strong> {product.activity}</div>
+									<div className="product-metadata">
+										{product.collection?.name && (
+											<div className="metadata-item">
+												<span className="metadata-label">Collection:</span>
+												{product.collection.name}
+											</div>
+										)}
+										<div className="metadata-item">
+											<span className="metadata-label">Category:</span>
+											{product.type} | {product.gender === 'm' ? 'Men' : 'Women'}
+										</div>
+										{product.activity && (
+											<div className="metadata-item">
+												<span className="metadata-label">Activity:</span>
+												{product.activity}
+											</div>
+										)}
 									</div>
+
 									<div className="product-actions">
 										<button 
-											className="btn btn-primary"
+											className="btn btn-secondary"
 											onClick={() => handleEditProduct(product)}
 										>
-											<FontAwesomeIcon icon={faEdit} />
+											<FontAwesomeIcon icon={faEdit} className="icon-left" />
 											Edit
 										</button>
 										<button 
 											className="btn btn-danger"
 											onClick={() => handleDeleteProduct(product._id)}
 										>
-											<FontAwesomeIcon icon={faTrash} />
+											<FontAwesomeIcon icon={faTrash} className="icon-left" />
 											Delete
 										</button>
 									</div>
@@ -182,25 +190,24 @@ const ProductManagement = () => {
 				)}
 
 				{!loading && products.length === 0 && (
-					<div className="text-center py-16">
-						<div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-							<FontAwesomeIcon icon={faBoxes} className="text-3xl text-gray-400" />
+					<div className="empty-state">
+						<div className="empty-state-icon">
+							<FontAwesomeIcon icon={faBoxes} />
 						</div>
-						<h3 className="text-xl font-bold text-gray-900 mb-4">
+						<h3 className="empty-state-title">
 							{searchTerm ? 'No products found' : 'No products yet'}
 						</h3>
-						<p className="text-gray-600 mb-8">
+						<p className="empty-state-description">
 							{searchTerm ? 'Try adjusting your search terms.' : 'Add your first product to get started!'}
 						</p>
 						{!searchTerm && (
 							<button className="btn btn-primary" onClick={handleAddProduct}>
-								<FontAwesomeIcon icon={faPlus} className="mr-2" />
+								<FontAwesomeIcon icon={faPlus} className="icon-left" />
 								Add Your First Product
 							</button>
 						)}
 					</div>
 				)}
-			</div>
 
 			{showModal && (
 				<ProductModal

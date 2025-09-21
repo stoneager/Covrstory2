@@ -9,64 +9,121 @@ const OrderDetailsModal = ({ order, onClose }) => {
     return `${line1 || ''}${area ? ', ' + area : ''}${city ? ', ' + city : ''}${pincode ? ' - ' + pincode : ''}`;
   };
 
+  const getStatusClass = (status) => {
+    const statusMap = {
+      'pending': 'status-pending',
+      'confirmed': 'status-confirmed',
+      'shipped': 'status-shipped',
+      'delivered': 'status-delivered',
+      'cancelled': 'status-cancelled'
+    };
+    return statusMap[status?.toLowerCase()] || 'status-pending';
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative">
-        <button
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl font-bold"
-          onClick={onClose}
-        >
-          &times;
-        </button>
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <div className="modal-header">
+          <h2>Order Details</h2>
+          <button className="modal-close" onClick={onClose}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
 
-        <h2 className="text-xl font-bold mb-4">Order Details</h2>
+        <div className="modal-body">
+          <div className="order-detail-row">
+            <span className="order-detail-label">Order ID</span>
+            <span className="order-detail-value font-mono">{order._id}</span>
+          </div>
 
-        <div className="mb-2">
-          <span className="font-semibold">User Name:</span> {order.user?.name || 'N/A'}
-        </div>
-        <div className="mb-2">
-          <span className="font-semibold">Email:</span> {order.user?.email || 'N/A'}
-        </div>
-        <div className="mb-2">
-          <span className="font-semibold">Mobile:</span> {order.mobile || 'N/A'}
-        </div>
-        <div className="mb-2">
-          <span className="font-semibold">Address:</span> {formatAddress(order.address)}
-        </div>
-        <div className="mb-2">
-          <span className="font-semibold">Order ID:</span> {order._id}
-        </div>
-        <div className="mb-2">
-          <span className="font-semibold">Total MRP:</span> ₹{order.total_mrp?.toLocaleString() || 0}
-        </div>
-        <div className="mb-2">
-          <span className="font-semibold">Discount:</span> ₹{order.discount_amount?.toLocaleString() || 0}
-        </div>
-        <div className="mb-2">
-          <span className="font-semibold">Final Amount:</span> ₹{order.final_amount?.toLocaleString() || 0}
-        </div>
-        <div className="mb-2">
-          <span className="font-semibold">Status:</span> {order.stages || 'N/A'}
-        </div>
-        <div className="mb-2">
-          <span className="font-semibold">Payment Status:</span> {order.payment_status || 'N/A'}
-        </div>
-        <div className="mb-2">
-          <span className="font-semibold">Created At:</span> {order.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A'}
-        </div>
-        <div className="mb-2">
-          <span className="font-semibold">Items:</span>
-          <ul className="list-disc ml-6">
+          <div className="order-detail-row">
+            <span className="order-detail-label">User Name</span>
+            <span className="order-detail-value">{order.user?.name || 'N/A'}</span>
+          </div>
+
+          <div className="order-detail-row">
+            <span className="order-detail-label">Email</span>
+            <span className="order-detail-value">{order.user?.email || 'N/A'}</span>
+          </div>
+
+          <div className="order-detail-row">
+            <span className="order-detail-label">Mobile</span>
+            <span className="order-detail-value">{order.mobile || 'N/A'}</span>
+          </div>
+
+          <div className="order-detail-row">
+            <span className="order-detail-label">Address</span>
+            <span className="order-detail-value">{formatAddress(order.address)}</span>
+          </div>
+
+          <div className="order-detail-row">
+            <span className="order-detail-label">Total MRP</span>
+            <span className="order-detail-value">₹{order.total_mrp?.toLocaleString() || 0}</span>
+          </div>
+
+          <div className="order-detail-row">
+            <span className="order-detail-label">Discount</span>
+            <span className="order-detail-value">₹{order.discount_amount?.toLocaleString() || 0}</span>
+          </div>
+
+          <div className="order-detail-row">
+            <span className="order-detail-label">Final Amount</span>
+            <span className="order-detail-value font-semibold">₹{order.final_amount?.toLocaleString() || 0}</span>
+          </div>
+
+          <div className="order-detail-row">
+            <span className="order-detail-label">Order Status</span>
+            <span className="order-detail-value">
+              <span className={`status-badge ${getStatusClass(order.stages)}`}>
+                {order.stages || 'N/A'}
+              </span>
+            </span>
+          </div>
+
+          <div className="order-detail-row">
+            <span className="order-detail-label">Payment Status</span>
+            <span className="order-detail-value">
+              <span className={`status-badge ${order.payment_status?.toLowerCase() === 'paid' ? 'status-delivered' : 'status-pending'}`}>
+                {order.payment_status || 'N/A'}
+              </span>
+            </span>
+          </div>
+
+          <div className="order-detail-row">
+            <span className="order-detail-label">Created At</span>
+            <span className="order-detail-value">{order.createdAt ? new Date(order.createdAt).toLocaleString() : 'N/A'}</span>
+          </div>
+
+          <div className="order-items-list">
+            <h3 className="text-lg font-semibold mb-3">Order Items</h3>
             {order.items?.length > 0 ? (
               order.items.map((item, idx) => (
-                <li key={idx}>
-                  {item.productName} ({item.size || 'N/A'}, {item.colour || 'N/A'}) x {item.qty} - ₹{item.price?.toLocaleString() || 0}
-                </li>
+                <div key={idx} className="order-item">
+                  <div className="order-item-details">
+                    <div className="font-medium text-base mb-1 text-black">
+                      {item.productName || (item.productQuantity?.product?.name) || 'N/A'}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      <span className="inline-block mr-3">Size: {item.size || 'N/A'}</span>
+                      <span className="inline-block mr-3">Color: {item.colour || 'N/A'}</span>
+                      <span className="inline-block">Quantity: {item.qty}</span>
+                    </div>
+                  </div>
+                  <div className="order-item-price font-semibold">₹{item.price?.toLocaleString() || 0}</div>
+                </div>
               ))
             ) : (
-              <li>No items found</li>
+              <div className="text-gray-500">No items found</div>
             )}
-          </ul>
+          </div>
+        </div>
+
+        <div className="modal-footer">
+          <button onClick={onClose} className="btn btn-secondary">
+            Close
+          </button>
         </div>
       </div>
     </div>
