@@ -79,6 +79,7 @@ export const paymentAPI = {
 // Orders API
 export const ordersAPI = {
   getMyOrders: () => api.get('/orders/my'),
+  checkReturnExists: (orderId) => api.get(`/returns/check/${orderId}`),
 };
 
 // Returns API

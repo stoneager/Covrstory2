@@ -8,13 +8,14 @@ const router = express.Router();
 // Create return request
 router.post('/', auth, customerOnly, async (req, res) => {
   try {
+    
     const { orderId, productQuantity, reason } = req.body;
 
     // Verify order exists and belongs to user
     const order = await Order.findOne({ 
       _id: orderId, 
       user: req.user._id,
-      stages: 'delivered'
+      stages: 'Delivered'
     });
 
     if (!order) {
@@ -49,6 +50,17 @@ router.post('/', auth, customerOnly, async (req, res) => {
       .populate('productQuantity.productQuantity');
 
     res.status(201).json(populatedReturn);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.get('/check/:orderId', auth, customerOnly, async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const returnRequest = await Return.findOne({ orderId, userId: req.user._id });
+    
+    res.json({ exists: !!returnRequest });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

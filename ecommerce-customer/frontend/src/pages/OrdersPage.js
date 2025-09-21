@@ -5,6 +5,7 @@ import ReturnOrderModal from '../components/ReturnOrderModal';
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
+  const [alreadyReturnedOrders, setAlreadyReturnedOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -27,6 +28,27 @@ const OrdersPage = () => {
     };
     fetchOrders();
   }, []);
+
+  useEffect(() => {
+  const checkReturns = async () => {
+    try {
+      const checks = await Promise.all(
+        orders.map(async (order) => {
+          const res = await ordersAPI.checkReturnExists(order._id);
+          return { orderId: order._id, exists: res.data.exists }; 
+        })
+      );
+
+      setAlreadyReturnedOrders(checks);
+      console.log('Already returned orders:', checks);
+    } catch (error) {
+      console.error('Error checking return requests:', error);
+    }
+  };
+
+  if (orders.length > 0) checkReturns();
+}, [orders]);
+
 
   const handleViewOrder = (order) => {
     setSelectedOrder(order);
@@ -62,9 +84,14 @@ const OrdersPage = () => {
     fetchOrders();
   };
 
+  
+
   const canReturnOrder = (order) => {
-    if (order.stages !== 'delivered') return false;
     
+    if (order.stages !== 'Delivered') return false;
+    
+    if (alreadyReturnedOrders.some(o => o.orderId === order._id && o.exists)) return false;
+
     const deliveryDate = new Date(order.updatedAt);
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     
