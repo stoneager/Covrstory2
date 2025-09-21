@@ -46,6 +46,13 @@ router.get('/stats', dummyAuth, ownerOnly, async (req, res) => {
     
 		const orders = await Order.find(dateFilter)
 			.populate('user', 'name email')
+			.populate({
+				path: 'items.productQuantity',
+				populate: {
+					path: 'product',
+					select: 'name'
+				}
+			})
 			.sort({ createdAt: -1 })
 			.limit(50);
     
@@ -60,6 +67,13 @@ router.get('/', dummyAuth, ownerOnly, async (req, res) => {
 	try {
 		const orders = await Order.find()
 			.populate('user', 'name email')
+			.populate({
+				path: 'items.productQuantity',
+				populate: {
+					path: 'product',
+					select: 'name'
+				}
+			})
 			.sort({ createdAt: -1 });
 		res.json(orders);
 	} catch (error) {

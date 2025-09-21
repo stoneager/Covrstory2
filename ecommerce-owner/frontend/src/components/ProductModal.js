@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faPlus, faMinus, faTrash, faImage } from '@fortawesome/free-solid-svg-icons';
 import { productsAPI, uploadAPI } from '../services/api';
 
+
 const ProductModal = ({ product, collections, onClose, onSave }) => {
 	const [formData, setFormData] = useState({
 		collection: '',
@@ -22,20 +23,29 @@ const ProductModal = ({ product, collections, onClose, onSave }) => {
 	const [loading, setLoading] = useState(false);
 	const [isEditMode, setIsEditMode] = useState(false);
 	const [uploadingImages, setUploadingImages] = useState({});
+	const [activeVariant, setActiveVariant] = useState(0);
 
 	useEffect(() => {
 		if (product) {
 			setIsEditMode(true);
-			setFormData({
-				collection: product.collection._id,
-				type: product.type,
-				gender: product.gender,
-				activity: product.activity,
-				name: product.name,
-				description: product.description,
-				variants: []
+			// Fetch quantities and set variants from backend
+			productsAPI.getById(product._id).then(response => {
+				const variants = groupQuantitiesByColor(response.data.quantities);
+				setFormData({
+					collection: product.collection?._id || '',
+					type: product.type || 'top',
+					gender: product.gender || 'm',
+					activity: product.activity || '',
+					name: product.name || '',
+					description: product.description || '',
+					variants: variants.length > 0 ? variants : [{
+						colour: '',
+						price: '',
+						sizes: [{ size: 's', qty: 0 }],
+						images: []
+					}]
+				});
 			});
-			fetchProductQuantities();
 		}
 	}, [product]);
 
@@ -88,17 +98,20 @@ const ProductModal = ({ product, collections, onClose, onSave }) => {
 		setFormData(prev => ({ ...prev, variants: newVariants }));
 	};
 
+
 	const addVariant = () => {
-		setFormData(prev => ({
-			...prev,
-			variants: [...prev.variants, {
+		setFormData(prev => {
+			const newVariants = [...prev.variants, {
 				colour: '',
 				price: '',
 				sizes: [{ size: 's', qty: 0 }],
 				images: []
-			}]
-		}));
+			}];
+			return { ...prev, variants: newVariants };
+		});
+		setActiveVariant(formData.variants.length); // Move to new variant
 	};
+
 
 	const removeVariant = (index) => {
 		if (formData.variants.length === 1) {
@@ -107,6 +120,7 @@ const ProductModal = ({ product, collections, onClose, onSave }) => {
 		}
 		const newVariants = formData.variants.filter((_, i) => i !== index);
 		setFormData(prev => ({ ...prev, variants: newVariants }));
+		setActiveVariant(prev => Math.max(0, prev - (index === prev ? 1 : 0)));
 	};
 
 	const addSize = (variantIndex) => {
@@ -250,31 +264,29 @@ const ProductModal = ({ product, collections, onClose, onSave }) => {
 	};
 
 	return (
-		<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-			<div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-				<div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gray-50">
-					<h2 className="text-2xl font-bold text-gray-900">
-						{isEditMode ? 'Edit Product' : 'Add New Product'}
-					</h2>
+		<div className="modal-overlay">
+			<div className="modal-content">
+				<div className="modal-header">
+					<h2>{isEditMode ? 'Edit Product' : 'Add New Product'}</h2>
 					<button 
 						onClick={onClose}
-						className="p-2 hover:bg-gray-200 rounded-lg transition-colors duration-200"
+						className="modal-close"
 					>
-						<FontAwesomeIcon icon={faTimes} className="text-gray-600" />
+						<FontAwesomeIcon icon={faTimes} />
 					</button>
 				</div>
         
-				<form onSubmit={handleSubmit} className="flex flex-col h-full">
-					<div className="flex-1 overflow-y-auto p-6 space-y-6">
+				<form onSubmit={handleSubmit}>
+					<div className="modal-body">
 						{/* Basic Product Information */}
-						<div className="bg-gray-50 rounded-xl p-6">
-							<h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-2">Collection *</label>
+						<div className="form-section">
+							<h3 className="form-section-title">Basic Information</h3>
+							<div className="form-grid">
+								<div className="form-group">
+									<label className="form-label">Collection *</label>
 									<select
 										name="collection"
-										className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+										className="form-control"
 										value={formData.collection}
 										onChange={handleInputChange}
 										required
@@ -288,12 +300,12 @@ const ProductModal = ({ product, collections, onClose, onSave }) => {
 									</select>
 								</div>
 
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
+								<div className="form-group">
+									<label className="form-label">Product Name *</label>
 									<input
 										type="text"
 										name="name"
-										className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+										className="form-control"
 										value={formData.name}
 										onChange={handleInputChange}
 										placeholder="Enter product name"
@@ -301,11 +313,11 @@ const ProductModal = ({ product, collections, onClose, onSave }) => {
 									/>
 								</div>
 
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-2">Type *</label>
+								<div className="form-group">
+									<label className="form-label">Type *</label>
 									<select
 										name="type"
-										className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+										className="form-control"
 										value={formData.type}
 										onChange={handleInputChange}
 										required
@@ -315,11 +327,11 @@ const ProductModal = ({ product, collections, onClose, onSave }) => {
 									</select>
 								</div>
 
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-2">Gender *</label>
+								<div className="form-group">
+									<label className="form-label">Gender *</label>
 									<select
 										name="gender"
-										className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+										className="form-control"
 										value={formData.gender}
 										onChange={handleInputChange}
 										required
@@ -329,84 +341,70 @@ const ProductModal = ({ product, collections, onClose, onSave }) => {
 									</select>
 								</div>
 
-								<div className="md:col-span-2">
-									<label className="block text-sm font-medium text-gray-700 mb-2">Activity *</label>
-									<input
-										type="text"
-										name="activity"
-										className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-										value={formData.activity}
-										onChange={handleInputChange}
-										placeholder="e.g., Running, Casual, Formal"
-										required
-									/>
-								</div>
-
-								<div className="md:col-span-2">
-									<label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
-									<textarea
-										name="description"
-										rows="4"
-										className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-										value={formData.description}
-										onChange={handleInputChange}
-										placeholder="Enter product description"
-										required
-									/>
-								</div>
-							</div>
-						</div>
-
-						{/* Product Variants */}
-						<div className="bg-gray-50 rounded-xl p-6">
-							<div className="flex items-center justify-between mb-4">
-								<h3 className="text-lg font-semibold text-gray-900">Product Variants</h3>
-								<button 
-									type="button" 
-									onClick={addVariant}
-									className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2"
-								>
-									<FontAwesomeIcon icon={faPlus} />
-									Add Variant
-								</button>
-							</div>
-
-							<div className="space-y-6">
-								{formData.variants.map((variant, variantIndex) => (
-									<div key={variantIndex} className="bg-white border border-gray-200 rounded-xl p-6">
-										<div className="flex items-center justify-between mb-4">
-											<h4 className="text-md font-semibold text-gray-800">Variant {variantIndex + 1}</h4>
+								<div className="variants-toggle-container">
+									<div className="variants-toggle-bar">
+										{formData.variants.map((_, idx) => (
+											<button
+												key={idx}
+												type="button"
+												className={`variant-toggle-btn${activeVariant === idx ? ' active' : ''}`}
+												onClick={() => setActiveVariant(idx)}
+											>
+												{`Variant ${idx + 1}`}
+											</button>
+										))}
+									</div>
+									<div className="variants-toggle-nav">
+										<button
+											type="button"
+											className="variant-nav-btn"
+											onClick={() => setActiveVariant(v => Math.max(0, v - 1))}
+											disabled={activeVariant === 0}
+										>
+											Prev
+										</button>
+										<span className="variant-nav-indicator">{`Variant ${activeVariant + 1} of ${formData.variants.length}`}</span>
+										<button
+											type="button"
+											className="variant-nav-btn"
+											onClick={() => setActiveVariant(v => Math.min(formData.variants.length - 1, v + 1))}
+											disabled={activeVariant === formData.variants.length - 1}
+										>
+											Next
+										</button>
+									</div>
+									<div className="variant-section">
+										<div className="variant-header">
+											<h4 className="variant-title">Variant {activeVariant + 1}</h4>
 											{formData.variants.length > 1 && (
-												<button 
-													type="button" 
-													onClick={() => removeVariant(variantIndex)}
-													className="text-red-600 hover:text-red-800 p-2 hover:bg-red-50 rounded-lg transition-colors duration-200"
+												<button
+													type="button"
+													onClick={() => removeVariant(activeVariant)}
+													className="btn btn-danger"
 												>
-													<FontAwesomeIcon icon={faTrash} />
+													<FontAwesomeIcon icon={faTrash} className="icon-left" />
 												</button>
 											)}
 										</div>
-
-										<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-											<div>
-												<label className="block text-sm font-medium text-gray-700 mb-2">Color *</label>
+										<div className="variant-grid">
+											<div className="form-group">
+												<label className="form-label">Color *</label>
 												<input
 													type="text"
-													className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-													value={variant.colour}
-													onChange={(e) => handleVariantChange(variantIndex, 'colour', e.target.value)}
+													className="form-control"
+													value={formData.variants[activeVariant]?.colour ?? ''}
+													onChange={e => handleVariantChange(activeVariant, 'colour', e.target.value)}
 													placeholder="e.g., Red, Blue, Black"
 													required
 												/>
 											</div>
-
-											<div>
-												<label className="block text-sm font-medium text-gray-700 mb-2">Price (₹) *</label>
+											<div className="form-group">
+												<label className="form-label">Price (₹) *</label>
 												<input
 													type="number"
-													className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-													value={variant.price}
-													onChange={(e) => handleVariantChange(variantIndex, 'price', e.target.value)}
+													className="form-control"
+													value={formData.variants[activeVariant]?.price ?? ''}
+													onChange={e => handleVariantChange(activeVariant, 'price', e.target.value)}
 													placeholder="0.00"
 													min="0"
 													step="0.01"
@@ -414,28 +412,25 @@ const ProductModal = ({ product, collections, onClose, onSave }) => {
 												/>
 											</div>
 										</div>
-
-										{/* Sizes & Stock */}
-										<div className="mb-4">
-											<div className="flex items-center justify-between mb-3">
-												<label className="block text-sm font-medium text-gray-700">Sizes & Stock</label>
-												<button 
-													type="button" 
-													onClick={() => addSize(variantIndex)}
-													className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1"
+										<div className="sizes-section">
+											<div className="form-section-header">
+												<label className="form-label">Sizes & Stock</label>
+												<button
+													type="button"
+													onClick={() => addSize(activeVariant)}
+													className="btn btn-secondary btn-sm"
 												>
-													<FontAwesomeIcon icon={faPlus} />
+													<FontAwesomeIcon icon={faPlus} className="icon-left" />
 													Add Size
 												</button>
 											</div>
-
-											<div className="space-y-2">
-												{variant.sizes.map((size, sizeIndex) => (
-													<div key={sizeIndex} className="flex items-center gap-3">
+											<div className="sizes-container">
+												{(formData.variants[activeVariant]?.sizes ?? []).map((size, sizeIndex) => (
+													<div key={sizeIndex} className="sizes-grid">
 														<select
-															className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+															className="form-control"
 															value={size.size}
-															onChange={(e) => handleSizeChange(variantIndex, sizeIndex, 'size', e.target.value)}
+															onChange={e => handleSizeChange(activeVariant, sizeIndex, 'size', e.target.value)}
 															required
 														>
 															<option value="xs">XS</option>
@@ -447,18 +442,18 @@ const ProductModal = ({ product, collections, onClose, onSave }) => {
 														</select>
 														<input
 															type="number"
-															className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+															className="form-control"
 															placeholder="Stock quantity"
 															value={size.qty}
-															onChange={(e) => handleSizeChange(variantIndex, sizeIndex, 'qty', e.target.value)}
+															onChange={e => handleSizeChange(activeVariant, sizeIndex, 'qty', e.target.value)}
 															min="0"
 															required
 														/>
-														{variant.sizes.length > 1 && (
-															<button 
-																type="button" 
-																onClick={() => removeSize(variantIndex, sizeIndex)}
-																className="text-red-600 hover:text-red-800 p-2 hover:bg-red-50 rounded-lg transition-colors duration-200"
+														{(formData.variants[activeVariant]?.sizes?.length ?? 0) > 1 && (
+															<button
+																type="button"
+																onClick={() => removeSize(activeVariant, sizeIndex)}
+																className="btn btn-danger btn-sm"
 															>
 																<FontAwesomeIcon icon={faMinus} />
 															</button>
@@ -467,76 +462,70 @@ const ProductModal = ({ product, collections, onClose, onSave }) => {
 												))}
 											</div>
 										</div>
-
-										{/* Images */}
-										<div>
-											<label className="block text-sm font-medium text-gray-700 mb-2">Images</label>
-											<div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-gray-400 transition-colors duration-200">
+										<div className="form-group">
+											<label className="form-label">Images</label>
+											<div className="image-upload">
 												<input
 													type="file"
 													multiple
 													accept="image/*"
-													onChange={(e) => handleImageUpload(variantIndex, e.target.files)}
-													className="w-full"
-													disabled={uploadingImages[variantIndex]}
+													onChange={e => handleImageUpload(activeVariant, e.target.files)}
+													disabled={uploadingImages[activeVariant]}
 												/>
-												{uploadingImages[variantIndex] && (
-													<div className="flex items-center justify-center mt-2 text-blue-600">
-														<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
-														Uploading images...
+												{uploadingImages[activeVariant] && (
+													<div className="loading-state">
+														<div className="loading-spinner"></div>
+														<span>Uploading images...</span>
 													</div>
 												)}
 											</div>
-											
-											{variant.images.length > 0 && (
-												<div className="grid grid-cols-4 gap-3 mt-4">
-													{variant.images.map((image, imgIndex) => (
-														<div key={imgIndex} className="relative group">
-															<img 
-																src={image} 
-																alt={`${variant.colour} ${imgIndex + 1}`} 
-																className="w-full h-20 object-cover rounded-lg border border-gray-200"
+											{formData.variants[activeVariant].images.length > 0 && (
+												<div className="image-preview-grid">
+													{formData.variants[activeVariant].images.map((image, imgIndex) => (
+														<div key={imgIndex} className="image-preview-item">
+															<img
+																src={image}
+																alt={`${formData.variants[activeVariant].colour} ${imgIndex + 1}`}
 															/>
 															<button
 																type="button"
-																onClick={() => removeImage(variantIndex, imgIndex)}
-																className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600"
+																onClick={() => removeImage(activeVariant, imgIndex)}
+																className="remove-image-btn"
 															>
-																<FontAwesomeIcon icon={faTimes} className="text-xs" />
+																<FontAwesomeIcon icon={faTimes} />
 															</button>
 														</div>
 													))}
 												</div>
 											)}
-										</div>
 									</div>
-								))}
-							</div>
-						</div>
-					</div>
-
-					<div className="flex items-center justify-end gap-4 p-6 border-t border-gray-200 bg-gray-50">
+								</div> {/* end variant-section */}
+							</div> {/* end variants-toggle-container */}
+						</div> {/* end form-grid */}
+					</div> {/* end form-section */}
+				</div> {/* end modal-body */}
+					<div className="modal-footer">
 						<button 
 							type="button" 
 							onClick={onClose}
-							className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium"
+							className="btn btn-secondary"
 						>
 							Cancel
 						</button>
 						<button 
 							type="submit" 
 							disabled={loading}
-							className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 font-medium flex items-center gap-2"
+							className="btn btn-primary"
 						>
-							{loading && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>}
-							
-							{loading ? 'Saving...' : (isEditMode ? 'Update Product' : 'Create Product')}
+							{loading && <div className="spinner"></div>}
+							{loading ? 'Saving...' : 
+								isEditMode ? 'Update Product' : 'Create Product'
+							}
 						</button>
 					</div>
 				</form>
 			</div>
 		</div>
 	);
-};
-
+}
 export default ProductModal;

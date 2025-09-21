@@ -134,136 +134,131 @@ const CollectionManagement = () => {
 	};
 
 	return (
-		<div>
-			<div className="card-header">
-				<div>
-					<h1 className="card-title">Collection Management</h1>
-					<p className="text-gray-600 text-lg mt-2">Organize your products into collections</p>
+	<div >
+				<div className="card-header">
+					<div>
+						<h1 className="card-title">Collection Management</h1>
+						<p className="text-gray-600 text-lg mt-2">Organize your products into collections</p>
+					</div>
+					<button className="btn btn-primary" onClick={handleAddCollection}>
+						<FontAwesomeIcon icon={faPlus} />
+						Add Collection
+					</button>
 				</div>
-				<button className="btn btn-primary" onClick={handleAddCollection}>
-					<FontAwesomeIcon icon={faPlus} />
-					Add Collection
-				</button>
-			</div>
-
-			<div className="product-grid">
-				{collections.map(collection => (
-					<div key={collection._id} className="product-card">
-						{collection.image && (
-							<img 
-								src={collection.image} 
-								alt={collection.name} 
-								className="product-image"
-							/>
-						)}
-						<div className="product-info">
-							<h3 className="product-name">{collection.name}</h3>
-							<div className="product-actions">
-								<button 
-									className="btn btn-primary"
-									onClick={() => handleEditCollection(collection)}
-								>
-									<FontAwesomeIcon icon={faEdit} />
-									Edit
-								</button>
-								<button 
-									className="btn btn-danger"
-									onClick={() => handleDeleteCollection(collection._id)}
-								>
-									<FontAwesomeIcon icon={faTrash} />
-									Delete
-								</button>
+				<div className="product-grid">
+					{collections.map(collection => (
+						<div key={collection._id} className="product-card">
+							{collection.image ? (
+								<img 
+									src={collection.image} 
+									alt={collection.name} 
+									className="product-image"
+								/>
+							) : (
+								<div className="no-image-text">No image</div>
+							)}
+							<div className="product-info">
+								<h3 className="product-name">{collection.name}</h3>
+								<div className="product-actions">
+									<button 
+										className="btn btn-primary"
+										onClick={() => handleEditCollection(collection)}
+									>
+										<FontAwesomeIcon icon={faEdit} />
+										Edit
+									</button>
+									<button 
+										className="btn btn-danger"
+										onClick={() => handleDeleteCollection(collection._id)}
+									>
+										<FontAwesomeIcon icon={faTrash} />
+										Delete
+									</button>
+								</div>
 							</div>
 						</div>
-					</div>
-				))}
-			</div>
-
-			{collections.length === 0 && (
-				<div className="card text-center py-16">
-					<div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-						<FontAwesomeIcon icon={faLayerGroup} className="text-3xl text-gray-400" />
-					</div>
-					<h3 className="text-xl font-bold text-gray-900 mb-4">No collections yet</h3>
-					<p className="text-gray-600 mb-8">Create your first collection to organize your products</p>
-					<button className="btn btn-primary" onClick={handleAddCollection}>
-						<FontAwesomeIcon icon={faPlus} className="mr-2" />
-						Create Your First Collection
-					</button>
-					</div>
-			)}
-
-			{showModal && (
-				<div className="modal-overlay">
-					<div className="modal">
-						<div className="modal-header">
-							<h2>{selectedCollection ? 'Edit Collection' : 'Add New Collection'}</h2>
-							<button className="btn btn-secondary" onClick={() => setShowModal(false)}>
-								<FontAwesomeIcon icon={faTimes} />
-							</button>
+					))}
+				</div>
+				{collections.length === 0 && (
+					<div className="empty-state">
+						<div className="empty-state-icon">
+							<FontAwesomeIcon icon={faLayerGroup} />
 						</div>
-            
-						<form onSubmit={handleSubmit}>
-							<div className="modal-body">
-								<div className="form-group">
-									<label className="form-label">Collection Name</label>
-									<input
-										type="text"
-										className="form-control"
-										placeholder="Enter collection name"
-										value={formData.name}
-										onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-										required
-									/>
-								</div>
-
-								<div className="form-group">
-									<label className="form-label">Collection Image</label>
-									<input
-										type="file"
-										className="form-control"
-										accept="image/*"
-										onChange={handleImageUpload}
-									/>
-									{uploading && (
-										<div className="flex items-center gap-2 mt-3 text-blue-600">
-											<div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-											<span className="text-sm font-medium">Uploading image...</span>
-										</div>
-									)}
-									{formData.image && !uploading && (
-										<div className="mt-4">
-											<img 
-												src={formData.image} 
-												alt="Preview" 
-												className="w-48 h-36 object-cover rounded-lg border border-gray-200"
-											/>
-											<div className="flex items-center gap-2 mt-2 text-green-600">
-												<svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-													<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-												</svg>
-												<span className="text-sm font-medium">
-												✓ Image uploaded successfully
-												</span>
+						<div className="empty-state-title">No collections yet</div>
+						<div className="empty-state-description">Create your first collection to organize your products</div>
+						<button className="btn btn-primary" onClick={handleAddCollection}>
+							<FontAwesomeIcon icon={faPlus} className="mr-2" />
+							Create Your First Collection
+						</button>
+					</div>
+				)}
+				{showModal && (
+					<div className="modal-overlay">
+						<div className="modal-content">
+							<div className="modal-header">
+								<h2>{selectedCollection ? 'Edit Collection' : 'Add New Collection'}</h2>
+								<button className="modal-close" onClick={() => setShowModal(false)}>
+									<FontAwesomeIcon icon={faTimes} />
+								</button>
+							</div>
+							<form onSubmit={handleSubmit}>
+								<div className="modal-body">
+									<div className="form-section">
+										<h3 className="form-section-title">Collection Details</h3>
+										<div className="form-grid">
+											<div className="form-group">
+												<label className="form-label">Collection Name</label>
+												<input
+													type="text"
+													className="form-control"
+													placeholder="Enter collection name"
+													value={formData.name}
+													onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+													required
+												/>
+											</div>
+											<div className="form-group">
+												<label className="form-label">Collection Image</label>
+												<input
+													type="file"
+													className="form-control"
+													accept="image/*"
+													onChange={handleImageUpload}
+												/>
+												{uploading && (
+													<div className="loading-state">
+														<div className="loading-spinner"></div>
+														<span>Uploading image...</span>
+													</div>
+												)}
+												{formData.image && !uploading && (
+													<div className="image-preview-grid">
+														<div className="image-preview-item">
+															<img 
+																src={formData.image} 
+																alt="Preview" 
+															/>
+														</div>
+														<div className="success-message">✓ Image uploaded successfully</div>
+													</div>
+												)}
 											</div>
 										</div>
-									)}
+									</div>
 								</div>
-							</div>
-
-							<div className="modal-footer">
-								<button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
-									Cancel
-								</button>
-								<button type="submit" className="btn btn-primary" disabled={loading || uploading}>
-									{loading ? 'Saving...' : (selectedCollection ? 'Update Collection' : 'Create Collection')}
-								</button>
-							</div>
-						</form>
+								<div className="modal-footer">
+									<button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
+										Cancel
+									</button>
+									<button type="submit" className="btn btn-primary" disabled={loading || uploading}>
+										{loading ? 'Saving...' : (selectedCollection ? 'Update Collection' : 'Create Collection')}
+									</button>
+								</div>
+							</form>
+						</div>
 					</div>
-				</div>
-			)}
-		</div>
+				)}
+			</div>
 	);
 };
 

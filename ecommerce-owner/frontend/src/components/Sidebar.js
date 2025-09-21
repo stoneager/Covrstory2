@@ -57,10 +57,10 @@ const Sidebar = () => {
       </ul>
 
       {/* Logout Button */}
-      <div className="px-6 py-8 border-t border-gray-200 mt-auto">
+      <div className="logout-section">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-200 font-semibold"
+          className="logout-button"
         >
           <FontAwesomeIcon icon={faSignOutAlt} />
           <span>Logout</span>

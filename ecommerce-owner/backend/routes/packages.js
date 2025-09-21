@@ -6,7 +6,15 @@ const Order = require('../models/Order');
 // Get all packages (latest first)
 router.get('/', async (req, res) => {
   try {
-    const packages = await Package.find().sort({ createdAt: -1 }).populate('orders');
+    const packages = await Package.find()
+      .sort({ createdAt: -1 })
+      .populate({
+        path: 'orders',
+        populate: {
+          path: 'user',
+          select: 'name email'
+        }
+      });
     res.json(packages);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -76,11 +84,15 @@ router.put('/:id', async (req, res) => {
       packageId,
       { orders: orderIds },
       { new: true }
-    ).populate('orders');
-    
+    ).populate({
+      path: 'orders',
+      populate: {
+        path: 'user',
+        select: 'name email'
+      }
+    });
     // Update package reference in orders
     await Order.updateMany({ _id: { $in: orderIds } }, { package: packageId });
-    
     res.json(updatedPackage);
   } catch (error) {
     res.status(500).json({ message: error.message });
