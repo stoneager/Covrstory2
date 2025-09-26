@@ -107,9 +107,10 @@ const ProductModal = ({ product, collections, onClose, onSave }) => {
 				sizes: [{ size: 's', qty: 0 }],
 				images: []
 			}];
+			// Set active variant to the newly added one using its new index
+			setActiveVariant(newVariants.length - 1);
 			return { ...prev, variants: newVariants };
 		});
-		setActiveVariant(formData.variants.length); // Move to new variant
 	};
 
 
@@ -199,8 +200,8 @@ const ProductModal = ({ product, collections, onClose, onSave }) => {
 		setLoading(true);
 
 		try {
-			// Validate form data
-			if (!formData.name || !formData.description || !formData.collection) {
+			// Validate form data (now includes activity)
+			if (!formData.name || !formData.description || !formData.collection || !formData.activity) {
 				alert('Please fill in all required fields');
 				setLoading(false);
 				return;
@@ -341,6 +342,32 @@ const ProductModal = ({ product, collections, onClose, onSave }) => {
 									</select>
 								</div>
 
+								<div className="form-group">
+									<label className="form-label">Activity *</label>
+									<input
+										type="text"
+										name="activity"
+										className="form-control"
+										value={formData.activity}
+										onChange={handleInputChange}
+										placeholder="e.g., Running, Casual, Training"
+										required
+									/>
+								</div>
+
+								<div className="form-group form-group-full">
+									<label className="form-label">Description *</label>
+									<textarea
+										name="description"
+										className="form-control"
+										value={formData.description}
+										onChange={handleInputChange}
+										rows={3}
+										placeholder="Enter a detailed product description"
+										required
+									/>
+								</div>
+
 								<div className="variants-toggle-container">
 									<div className="variants-toggle-bar">
 										{formData.variants.map((_, idx) => (
@@ -353,6 +380,13 @@ const ProductModal = ({ product, collections, onClose, onSave }) => {
 												{`Variant ${idx + 1}`}
 											</button>
 										))}
+										<button
+											type="button"
+											className="variant-toggle-btn add-variant-btn"
+											onClick={addVariant}
+										>
+											<FontAwesomeIcon icon={faPlus} /> Add Variant
+										</button>
 									</div>
 									<div className="variants-toggle-nav">
 										<button
