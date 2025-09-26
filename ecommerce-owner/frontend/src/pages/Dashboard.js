@@ -254,11 +254,6 @@ const Dashboard = () => {
 				
 				{orders.length === 0 && (
 					<div className="text-center py-12">
-						<div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-							<svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-								<path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" />
-							</svg>
-						</div>
 						<h3 className="text-lg font-semibold text-gray-900 mb-2">No orders yet</h3>
 						<p className="text-gray-600">Orders will appear here once customers start purchasing</p>
 					</div>
