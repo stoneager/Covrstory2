@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import StoryUploadModal from './StoryUploadModal';
 import { checkoutAPI } from '../services/api';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -7,9 +8,7 @@ import {
   faUser, 
   faSignOutAlt, 
   faBars, 
-  faTimes,
-  faSearch,
-  faHeart
+  faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
@@ -19,6 +18,7 @@ const Header = () => {
   const { getCartItemsCount } = useCart();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showStoryModal, setShowStoryModal] = useState(false);
   // Remove modal state
 
   const handleLogout = () => {
@@ -71,18 +71,19 @@ const Header = () => {
 
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center space-x-4">
-              {/* Search Icon */}
-              <button className="p-2 text-gray-600 hover:text-gray-900 transition-colors duration-200 rounded-lg hover:bg-gray-100">
-                <FontAwesomeIcon icon={faSearch} className="text-lg" />
-              </button>
-              
-              {/* Wishlist Icon */}
-              <button className="p-2 text-gray-600 hover:text-gray-900 transition-colors duration-200 rounded-lg hover:bg-gray-100">
-                <FontAwesomeIcon icon={faHeart} className="text-lg" />
-              </button>
-              
               {user ? (
                 <>
+                  {/* Add Story */}
+                  <button
+                    type="button"
+                    onClick={() => setShowStoryModal(true)}
+                    className="p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200 rounded-lg hover:bg-blue-50"
+                    title="Add Story"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </button>
                   {/* Cart */}
                   <Link 
                     to="/cart" 
@@ -167,6 +168,15 @@ const Header = () => {
               <div className="mt-8 pt-8 border-t border-gray-100">
                 {user ? (
                   <div className="space-y-6">
+                    <button
+                      onClick={() => { setShowStoryModal(true); closeMobileMenu(); }}
+                      className="flex items-center space-x-3 text-lg font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200 py-2"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      <span>Add Story</span>
+                    </button>
                     <Link
                       to="/cart"
                       onClick={closeMobileMenu}
@@ -207,6 +217,12 @@ const Header = () => {
           </div>
         </div>
       )}
+      {/* Story Upload Modal */}
+      <StoryUploadModal
+        isOpen={showStoryModal}
+        onClose={() => setShowStoryModal(false)}
+        onSuccess={() => { /* Optionally refresh a stories context if added later */ }}
+      />
     </>
   );
 };

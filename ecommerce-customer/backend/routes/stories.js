@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Story = require('../models/Story');
-const auth = require('../middleware/auth');
+// Destructure middleware functions (module exports an object)
+const { auth, customerOnly } = require('../middleware/auth');
 const multer = require('multer');
 const { S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const crypto = require('crypto');
@@ -16,7 +17,7 @@ const s3Client = new S3Client({
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-router.post('/', auth, upload.single('image'), async (req, res) => {
+router.post('/', auth, customerOnly, upload.single('image'), async (req, res) => {
   try {
     const { quote, description } = req.body;
 
@@ -65,7 +66,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', auth, customerOnly, async (req, res) => {
   try {
     const story = await Story.findById(req.params.id);
 

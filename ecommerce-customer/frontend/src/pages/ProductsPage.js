@@ -4,7 +4,7 @@ import { faSearch, faFilter, faTimes, faSliders } from '@fortawesome/free-solid-
 import { productsAPI, collectionsAPI } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { useCart } from '../contexts/CartContext';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -19,9 +19,18 @@ const ProductsPage = () => {
   const [sortBy, setSortBy] = useState('newest');
   const { cartItems, addToCart, updateCartItem, removeFromCart } = useCart();
 
+  const location = useLocation();
+
   useEffect(() => {
+    // If a collection query param exists, apply it on first load
+    const params = new URLSearchParams(location.search);
+    const collectionFromUrl = params.get('collection');
+    if (collectionFromUrl) {
+      setSelectedCollection(collectionFromUrl);
+    }
     fetchProducts();
     fetchCollections();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

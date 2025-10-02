@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Story = require('../models/Story');
-const auth = require('../middleware/auth');
+// Import specific middleware functions (module exports an object)
+const { dummyAuth, ownerOnly } = require('../middleware/auth');
 const { S3Client, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 
 const s3Client = new S3Client({
@@ -12,7 +13,7 @@ const s3Client = new S3Client({
   }
 });
 
-router.get('/all', auth, async (req, res) => {
+router.get('/all', dummyAuth, ownerOnly, async (req, res) => {
   try {
     const stories = await Story.find()
       .populate('userId', 'name email')
@@ -24,7 +25,7 @@ router.get('/all', auth, async (req, res) => {
   }
 });
 
-router.put('/:id/approve', auth, async (req, res) => {
+router.put('/:id/approve', dummyAuth, ownerOnly, async (req, res) => {
   try {
     const { approved } = req.body;
     const story = await Story.findByIdAndUpdate(
@@ -44,7 +45,7 @@ router.put('/:id/approve', auth, async (req, res) => {
   }
 });
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', dummyAuth, ownerOnly, async (req, res) => {
   try {
     const story = await Story.findById(req.params.id);
 
