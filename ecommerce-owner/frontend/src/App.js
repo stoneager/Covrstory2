@@ -9,6 +9,7 @@ import DiscountManagement from './pages/DiscountManagement';
 import CouponManagement from './pages/CouponManagement';
 import OrderTracking from './pages/OrderTracking';
 import ReturnsManagement from './pages/ReturnsManagement';
+import StoriesManagement from './pages/StoriesManagement';
 import { AuthProvider } from './contexts/AuthContext';
 import './App.css';
 
@@ -43,6 +44,7 @@ function App() {
                 <Route path="/coupons" element={<CouponManagement />} />
                 <Route path="/order-tracking" element={<OrderTracking />} />
                 <Route path="/returns" element={<ReturnsManagement />} />
+                <Route path="/stories" element={<StoriesManagement />} />
               </Routes>
             </main>
           </div>

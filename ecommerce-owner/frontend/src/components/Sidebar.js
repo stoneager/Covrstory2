@@ -1,14 +1,15 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faHome, 
-  faBoxes, 
-  faLayerGroup, 
-  faPercent, 
+import {
+  faHome,
+  faBoxes,
+  faLayerGroup,
+  faPercent,
   faTicketAlt,
   faUndo,
-  faSignOutAlt
+  faSignOutAlt,
+  faComments
 } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -24,7 +25,8 @@ const Sidebar = () => {
     { path: '/discounts', label: 'Discounts', icon: faPercent },
     { path: '/coupons', label: 'Coupons', icon: faTicketAlt },
     { path: '/order-tracking', label: 'Order Tracking', icon: faBoxes },
-    { path: '/returns', label: 'Returns Management', icon: faUndo }
+    { path: '/returns', label: 'Returns Management', icon: faUndo },
+    { path: '/stories', label: 'Stories Management', icon: faComments }
   ];
 
   const handleLogout = () => {

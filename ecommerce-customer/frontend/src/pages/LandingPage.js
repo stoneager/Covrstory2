@@ -3,19 +3,39 @@ import { Link } from 'react-router-dom';
 import { productsAPI, collectionsAPI } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { useAuth } from '../contexts/AuthContext';
+import axios from 'axios';
+import StoryUploadModal from '../components/StoryUploadModal';
 
 const LandingPage = () => {
   const [products, setProducts] = useState([]);
   const [collections, setCollections] = useState([]);
+  const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [storyModalOpen, setStoryModalOpen] = useState(false);
   const carouselRef = useRef(null);
+  const storiesRef = useRef(null);
   const { user } = useAuth();
 
   useEffect(() => {
     fetchProducts();
     fetchCollections();
+    fetchStories();
   }, []);
+
+  useEffect(() => {
+    if (stories.length > 0) {
+      const interval = setInterval(() => {
+        if (storiesRef.current) {
+          storiesRef.current.scrollLeft += storiesRef.current.offsetWidth / 3;
+          if (storiesRef.current.scrollLeft >= storiesRef.current.scrollWidth - storiesRef.current.offsetWidth) {
+            storiesRef.current.scrollLeft = 0;
+          }
+        }
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [stories]);
 
   const fetchCollections = async () => {
     try {
@@ -37,6 +57,30 @@ const LandingPage = () => {
     }
   };
 
+  const fetchStories = async () => {
+    try {
+      const response = await axios.get('http://localhost:5001/api/stories');
+      setStories(response.data);
+    } catch (error) {
+      console.error('Error fetching stories:', error);
+    }
+  };
+
+  const handleDeleteStory = async (storyId) => {
+    if (!window.confirm('Are you sure you want to delete this story?')) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:5001/api/stories/${storyId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchStories();
+    } catch (error) {
+      console.error('Error deleting story:', error);
+      alert('Failed to delete story');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -47,6 +91,25 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen">
+      {/* Story Upload Button */}
+      {user && (
+        <button
+          onClick={() => setStoryModalOpen(true)}
+          className="fixed right-8 bottom-8 bg-blue-600 text-white p-4 rounded-full shadow-2xl hover:bg-blue-700 transition-all z-50 hover:scale-110"
+          title="Share Your Story"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+        </button>
+      )}
+
+      <StoryUploadModal
+        isOpen={storyModalOpen}
+        onClose={() => setStoryModalOpen(false)}
+        onSuccess={fetchStories}
+      />
+
       {/* Hero Section */}
       <section className="relative overflow-hidden min-h-screen flex items-center">
         {/* Background Image */}
@@ -324,6 +387,63 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
+      {/* Customer Stories Section */}
+      {stories.length > 0 && (
+        <section className="section-padding bg-white">
+          <div className="container-custom">
+            <div className="text-center mb-16">
+              <div className="mb-4">
+                <span className="inline-block bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-semibold uppercase tracking-wide">
+                  Customer Stories
+                </span>
+              </div>
+              <h2 className="heading-lg text-gray-900 mb-6">What Our Customers Say</h2>
+              <p className="text-body max-w-2xl mx-auto text-lg">
+                Real experiences from our valued customers
+              </p>
+            </div>
+
+            <div
+              ref={storiesRef}
+              className="flex overflow-x-auto space-x-6 pb-4 scrollbar-hide"
+              style={{ scrollBehavior: 'smooth' }}
+            >
+              {stories.map((story) => (
+                <div
+                  key={story._id}
+                  className="flex-shrink-0 w-80 bg-gray-50 rounded-xl shadow-lg overflow-hidden relative"
+                >
+                  <img
+                    src={story.imageLink}
+                    alt={story.quote}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-6">
+                    <p className="text-lg font-bold text-gray-900 mb-3 italic">
+                      "{story.quote}"
+                    </p>
+                    <p className="text-gray-600 mb-4">{story.description}</p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-gray-500">
+                        {story.userId?.name || 'Customer'}
+                      </p>
+                      {user && user.id === story.userId?._id && (
+                        <button
+                          onClick={() => handleDeleteStory(story._id)}
+                          className="text-red-600 hover:text-red-800 text-sm font-semibold"
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Newsletter Section */}
       <section className="section-padding bg-gray-900 text-white relative overflow-hidden">
