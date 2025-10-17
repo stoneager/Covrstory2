@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPhone, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faPhone, faSpinner, faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithPopup, GoogleAuthProvider, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import { authAPI } from '../services/api';
+import EmailRegisterModal from '../components/EmailRegisterModal';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -21,12 +22,16 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 const LoginPage = () => {
-  const [authMethod, setAuthMethod] = useState('google');
+  const [authMethod, setAuthMethod] = useState('email');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otp, setOtp] = useState('');
   const [verificationId, setVerificationId] = useState('');
   const [loading, setLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -142,6 +147,30 @@ const LoginPage = () => {
     }
   };
 
+  const handleEmailLogin = async () => {
+    setError('');
+    if (!email || !password) {
+      setError('Please enter both email and password');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await authAPI.loginEmail({ email, password });
+
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('userRole', response.data.user.role);
+        localStorage.setItem('userInfo', JSON.stringify(response.data.user));
+        redirectUser(response.data.user.role, response.data.token);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-lg w-full space-y-8">
@@ -160,15 +189,33 @@ const LoginPage = () => {
 
         <div className="form-enhanced space-y-8">
           {/* Auth Method Selection */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
+            <button
+              onClick={() => {
+                setAuthMethod('email');
+                setOtpSent(false);
+                setOtp('');
+                setPhoneNumber('');
+                setError('');
+              }}
+              className={`py-4 px-4 font-bold transition-all duration-200 rounded-xl ${
+                authMethod === 'email'
+                  ? 'bg-gray-900 text-white shadow-lg'
+                  : 'bg-white text-gray-900 border border-gray-200 hover:border-gray-900 hover:shadow-md'
+              }`}
+            >
+              <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
+              Email
+            </button>
             <button
               onClick={() => {
                 setAuthMethod('google');
                 setOtpSent(false);
                 setOtp('');
                 setPhoneNumber('');
+                setError('');
               }}
-              className={`py-4 px-6 font-bold transition-all duration-200 rounded-xl ${
+              className={`py-4 px-4 font-bold transition-all duration-200 rounded-xl ${
                 authMethod === 'google'
                   ? 'bg-gray-900 text-white shadow-lg'
                   : 'bg-white text-gray-900 border border-gray-200 hover:border-gray-900 hover:shadow-md'
@@ -183,8 +230,9 @@ const LoginPage = () => {
                 setOtpSent(false);
                 setOtp('');
                 setPhoneNumber('');
+                setError('');
               }}
-              className={`py-4 px-6 font-bold transition-all duration-200 rounded-xl ${
+              className={`py-4 px-4 font-bold transition-all duration-200 rounded-xl ${
                 authMethod === 'phone'
                   ? 'bg-gray-900 text-white shadow-lg'
                   : 'bg-white text-gray-900 border border-gray-200 hover:border-gray-900 hover:shadow-md'
@@ -194,6 +242,71 @@ const LoginPage = () => {
               Phone
             </button>
           </div>
+
+          {/* Email Login */}
+          {authMethod === 'email' && (
+            <div className="space-y-6">
+              {error && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-700 text-sm font-medium">{error}</p>
+                </div>
+              )}
+              <div>
+                <label className="block text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <FontAwesomeIcon icon={faEnvelope} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="input-enhanced w-full pl-12"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">
+                  Password
+                </label>
+                <div className="relative">
+                  <FontAwesomeIcon icon={faLock} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="input-enhanced w-full pl-12"
+                    onKeyPress={(e) => e.key === 'Enter' && handleEmailLogin()}
+                  />
+                </div>
+              </div>
+              <button
+                onClick={handleEmailLogin}
+                disabled={loading || !email || !password}
+                className="btn-primary-enhanced w-full disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                {loading ? (
+                  <div className="loading-enhanced">
+                    <div className="spinner-enhanced"></div>
+                    <span>Signing in...</span>
+                  </div>
+                ) : (
+                  'Sign In'
+                )}
+              </button>
+              <div className="text-center">
+                <p className="text-sm text-gray-600 mb-2">Don't have an account?</p>
+                <button
+                  onClick={() => setShowRegisterModal(true)}
+                  className="text-gray-900 hover:text-gray-700 font-bold transition-colors text-lg"
+                >
+                  Create Account
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Google Login */}
           {authMethod === 'google' && (
@@ -314,6 +427,11 @@ const LoginPage = () => {
           </div>
         </div>
       </div>
+
+      <EmailRegisterModal
+        isOpen={showRegisterModal}
+        onClose={() => setShowRegisterModal(false)}
+      />
     </div>
   );
 };
