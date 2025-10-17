@@ -12,6 +12,10 @@ const api = axios.create({
 // Auth API
 export const authAPI = {
   login: (credentials) => api.post('/auth/login', credentials),
+  sendCode: (email) => api.post('/auth/send-code', { email }),
+  verifyCode: (email, code) => api.post('/auth/verify-code', { email, code }),
+  registerEmail: (data) => api.post('/auth/register-email', data),
+  loginEmail: (credentials) => api.post('/auth/login-email', credentials),
 };
 
 export default api;
